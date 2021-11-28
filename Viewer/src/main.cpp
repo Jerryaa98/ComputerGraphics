@@ -19,6 +19,8 @@
 bool show_demo_window = false;
 bool show_another_window = false;
 glm::vec4 clear_color = glm::vec4(0.8f, 0.8f, 0.8f, 1.00f);
+ImVec2 oldCoordinates;
+float oldMouseWheelPos;
 
 /**
  * Function declarations
@@ -40,9 +42,9 @@ void ScrollCallback(GLFWwindow* window, double xoffset, double yoffset)
 	// TODO: Handle mouse scroll here
 }
 
-int main(int argc, char **argv)
+int main(int argc, char** argv)
 {
-	int windowWidth = 1280, windowHeight = 720;
+	int windowWidth = 1280, windowHeight = 1001;
 	GLFWwindow* window = SetupGlfwWindow(windowWidth, windowHeight, "Mesh Viewer");
 	if (!window)
 		return 1;
@@ -53,19 +55,19 @@ int main(int argc, char **argv)
 
 	Renderer renderer = Renderer(frameBufferWidth, frameBufferHeight);
 	Scene scene = Scene();
-	
+
 	ImGuiIO& io = SetupDearImgui(window);
 	glfwSetScrollCallback(window, ScrollCallback);
-    while (!glfwWindowShouldClose(window))
-    {
-        glfwPollEvents();
+	while (!glfwWindowShouldClose(window))
+	{
+		glfwPollEvents();
 		StartFrame();
 		DrawImguiMenus(io, scene);
 		RenderFrame(window, scene, renderer, io);
-    }
+	}
 
 	Cleanup(window);
-    return 0;
+	return 0;
 }
 
 static void GlfwErrorCallback(int error, const char* description)
@@ -81,11 +83,11 @@ GLFWwindow* SetupGlfwWindow(int w, int h, const char* window_name)
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-	
-	#if __APPLE__
-		glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
-	#endif
-	
+
+#if __APPLE__
+	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+#endif
+
 	GLFWwindow* window = glfwCreateWindow(w, h, window_name, NULL, NULL);
 	glfwMakeContextCurrent(window);
 	glfwSwapInterval(1); // Enable vsync
@@ -120,7 +122,7 @@ void RenderFrame(GLFWwindow* window, Scene& scene, Renderer& renderer, ImGuiIO& 
 	int frameBufferWidth, frameBufferHeight;
 	glfwMakeContextCurrent(window);
 	glfwGetFramebufferSize(window, &frameBufferWidth, &frameBufferHeight);
-	
+
 	if (frameBufferWidth != renderer.GetViewportWidth() || frameBufferHeight != renderer.GetViewportHeight())
 	{
 		// TODO: Set new aspect ratio
@@ -128,11 +130,42 @@ void RenderFrame(GLFWwindow* window, Scene& scene, Renderer& renderer, ImGuiIO& 
 
 	if (!io.WantCaptureKeyboard)
 	{
-		// TODO: Handle keyboard events here
-		if (io.KeysDown[65])
+
+		// local translate
+		// 'W': translate Y-axis up (local)
+		if (io.KeysDown[87] || io.KeysDown[119])
 		{
-			// A key is down
-			// Use the ASCII table for more key codes (https://www.asciitable.com/)
+			if (scene.GetModelCount() > 0) {
+				MeshModel& model = scene.GetActiveModel();
+				model.localTranslateArray[1] += 20;
+			}
+		}
+
+		// 'A': translate X-axis left (local)
+		if (io.KeysDown[65] || io.KeysDown[97])
+		{
+			if (scene.GetModelCount() > 0) {
+				MeshModel& model = scene.GetActiveModel();
+				model.localTranslateArray[0] -= 20;
+			}
+		}
+
+		// 'S': translate Y-axis down (local)
+		if (io.KeysDown[83] || io.KeysDown[115])
+		{
+			if (scene.GetModelCount() > 0) {
+				MeshModel& model = scene.GetActiveModel();
+				model.localTranslateArray[1] -= 20;
+			}
+		}
+
+		// 'D': translate X-axis right (local)
+		if (io.KeysDown[68] || io.KeysDown[100])
+		{
+			if (scene.GetModelCount() > 0) {
+				MeshModel& model = scene.GetActiveModel();
+				model.localTranslateArray[0] += 20;
+			}
 		}
 	}
 
@@ -141,8 +174,42 @@ void RenderFrame(GLFWwindow* window, Scene& scene, Renderer& renderer, ImGuiIO& 
 		// TODO: Handle mouse events here
 		if (io.MouseDown[0])
 		{
+			ImVec2 newCoordinates = io.MousePos;
 			// Left mouse button is down
+			if (scene.GetModelCount() > 0) {
+				MeshModel& model = scene.GetActiveModel();
+				model.localRotateArray[1] += newCoordinates[0] - oldCoordinates[0];
+				model.localRotateArray[0] += newCoordinates[1] - oldCoordinates[1];
+			}
+			
+			
 		}
+		oldCoordinates = io.MousePos;
+
+		/*
+		tried to use scroll wheel to scale the object.
+		maybe implement it down the road.
+		*/
+		//if ((oldMouseWheelPos - io.MouseWheel) != 0) {
+		//	if (scene.GetModelCount() > 0) {
+		//		MeshModel& model = scene.GetActiveModel();
+		//		model.localTranslateArray[0] += io.MouseWheel * 10;
+		//		model.localTranslateArray[1] += io.MouseWheel * 10;
+		//	}
+		//}
+		//oldMouseWheelPos = io.MouseWheel;
+
+
+		//float scrollX = ImGui::GetScrollX();
+		//float scrollY = ImGui::GetScrollY();
+		//if (scrollY) {
+		//	if (scene.GetModelCount() > 0) {
+		//		MeshModel& model = scene.GetActiveModel();
+		//		model.localScaleArray[0] += 2;
+		//		model.localScaleArray[1] += 2;
+		//		model.localScaleArray[2] += 2;
+		//	}
+		//}
 	}
 
 	renderer.ClearColorBuffer(clear_color);
@@ -170,7 +237,7 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 	 * MeshViewer menu
 	 */
 	ImGui::Begin("MeshViewer Menu");
-	
+
 	// Menu Bar
 	if (ImGui::BeginMainMenuBar())
 	{
@@ -203,14 +270,14 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 	// Controls
 	ImGui::ColorEdit3("Clear Color", (float*)&clear_color);
 	// TODO: Add more controls as needed
-	
+
 	ImGui::End();
 
 	/**
 	 * Imgui demo - you can remove it once you are familiar with imgui
 	 */
-	
-	// 1. Show the big demo window (Most of the sample code is in ImGui::ShowDemoWindow()! You can browse its code to learn more about Dear ImGui!).
+
+	 // 1. Show the big demo window (Most of the sample code is in ImGui::ShowDemoWindow()! You can browse its code to learn more about Dear ImGui!).
 	if (show_demo_window)
 		ImGui::ShowDemoWindow(&show_demo_window);
 
@@ -246,4 +313,55 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 			show_another_window = false;
 		ImGui::End();
 	}
+
+	int modelCount = scene.GetModelCount();
+	// display transformations window if at least one model is loaded
+	if (modelCount) {
+		ImGui::Begin("Transformations Window");
+
+		ImGui::Text("Select Model:");
+
+		static int selected = 0;
+		for (int n = 0; n < modelCount; n++) {
+			char buf[64];
+			sprintf(buf, scene.modelsNames[n].c_str(), n);
+			if (ImGui::Selectable(buf, selected == n))
+				selected = n;
+		}
+
+		scene.SetActiveModelIndex(selected);
+		MeshModel& model = scene.GetActiveModel();
+
+		ImGui::Text("--- LOCAL TRANSFORMATIONS ---");
+		ImGui::Text("Local Scale:");
+		ImGui::SliderFloat3("Local Scale", model.localScaleArray, 1, model.maxScale);
+
+		ImGui::Checkbox("Lock All Local Axis", &(model.lockLocalScale));
+
+		ImGui::SliderFloat("Local Scale Locked", &(model.localScaleLocked), 1, model.maxScale);
+
+		ImGui::Text("Local Translate:");
+		ImGui::SliderFloat3("Local Translate", model.localTranslateArray, -500, 500);
+
+		ImGui::Text("Local Rotate:");
+		ImGui::SliderFloat3("Local Rotate", model.localRotateArray, -360, 360);
+
+
+		ImGui::Text("--- WORLD TRANSFORMATIONS ---");
+		ImGui::Text("World Scale:");
+		ImGui::SliderFloat3("World Scale", model.worldScaleArray, 1, 1000);
+
+		ImGui::Checkbox("Lock All World Axis", &(model.lockWorldScale));
+		ImGui::SliderFloat("World Scale Locked", &(model.worldScaleLocked), 1, 1000);
+
+		
+		ImGui::Text("World Translate:");
+		ImGui::SliderFloat3("World Translate", model.worldTranslateArray, -500, 500);
+		
+		ImGui::Text("World Rotate:");
+		ImGui::SliderFloat3("World Rotate", model.worldRotateArray, -360, 360);
+
+		ImGui::End();
+	}
+
 }

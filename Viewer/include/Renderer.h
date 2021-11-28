@@ -14,9 +14,13 @@ public:
 	int GetViewportWidth() const;
 	int GetViewportHeight() const;
 
+	void setViewportWidth(const int width);
+	void setViewportHeight(const int height);
+
 	// this is used for sanity check
 	void DrawCircle(const glm::ivec2& center, const float radius, const int stepSize);
-	
+
+	void CreateBuffers(int w, int h);
 private:
 	void PutPixel(const int i, const int j, const glm::vec3& color);
 	void DrawLine(const glm::ivec2& p1, const glm::ivec2& p2, const glm::vec3& color);
@@ -24,11 +28,10 @@ private:
 	// DrawLine helpers
 	void DrawLineHigh(const glm::ivec2& p1, const glm::ivec2& p2, const glm::vec3& color);
 	void DrawLineLow(const glm::ivec2& p1, const glm::ivec2& p2, const glm::vec3& color);
-	
-	
+
+
 	void DrawCat(const int scale);
-	
-	void CreateBuffers(int w, int h);
+
 	void CreateOpenglBuffer();
 	void InitOpenglRendering();
 

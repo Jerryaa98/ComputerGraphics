@@ -1,16 +1,14 @@
 #define _USE_MATH_DEFINES
 #include <cmath>
 #include <algorithm>
+#include <iostream>
+#include <glm/gtx/string_cast.hpp>
 
 #include "Renderer.h"
 #include "InitShader.h"
 
 #define INDEX(width,x,y,c) ((x)+(y)*(width))*3+(c)
 #define Z_INDEX(width,x,y) ((x)+(y)*(width))
-
-// Define the center point
-#define CENTER_X 640
-#define CENTER_Y 360
 
 # define CAT_SCALE 40
 
@@ -31,7 +29,7 @@ void Renderer::PutPixel(int i, int j, const glm::vec3& color)
 {
 	if (i < 0) return; if (i >= viewport_width) return;
 	if (j < 0) return; if (j >= viewport_height) return;
-	
+
 	color_buffer[INDEX(viewport_width, i, j, 0)] = color.x;
 	color_buffer[INDEX(viewport_width, i, j, 1)] = color.y;
 	color_buffer[INDEX(viewport_width, i, j, 2)] = color.z;
@@ -105,9 +103,9 @@ void Renderer::DrawLine(const glm::ivec2& p1, const glm::ivec2& p2, const glm::v
 
 	float dx = abs(p1.x - p2.x);
 	float dy = abs(p1.y - p2.y);
-	
+
 	if (dy < dx) {
-		if (p1.x > p2.x){
+		if (p1.x > p2.x) {
 			DrawLineLow(p2, p1, color);
 			return;
 		}
@@ -213,7 +211,7 @@ void Renderer::InitOpenglRendering()
 	//	     | \ | <--- The exture is drawn over two triangles that stretch over the screen.
 	//	     |__\|
 	// (-1,-1)    (1,-1)
-	const GLfloat vtc[]={
+	const GLfloat vtc[] = {
 		-1, -1,
 		 1, -1,
 		-1,  1,
@@ -222,19 +220,19 @@ void Renderer::InitOpenglRendering()
 		 1,  1
 	};
 
-	const GLfloat tex[]={
+	const GLfloat tex[] = {
 		0,0,
 		1,0,
 		0,1,
 		0,1,
 		1,0,
-		1,1};
+		1,1 };
 
 	// Makes this buffer the current one.
 	glBindBuffer(GL_ARRAY_BUFFER, buffer);
 
 	// This is the opengl way for doing malloc on the gpu. 
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vtc)+sizeof(tex), NULL, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vtc) + sizeof(tex), NULL, GL_STATIC_DRAW);
 
 	// memcopy vtc to buffer[0,sizeof(vtc)-1]
 	glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vtc), vtc);
@@ -243,25 +241,25 @@ void Renderer::InitOpenglRendering()
 	glBufferSubData(GL_ARRAY_BUFFER, sizeof(vtc), sizeof(tex), tex);
 
 	// Loads and compiles a sheder.
-	GLuint program = InitShader( "vshader.glsl", "fshader.glsl" );
+	GLuint program = InitShader("vshader.glsl", "fshader.glsl");
 
 	// Make this program the current one.
 	glUseProgram(program);
 
 	// Tells the shader where to look for the vertex position data, and the data dimensions.
-	GLint  vPosition = glGetAttribLocation( program, "vPosition" );
-	glEnableVertexAttribArray( vPosition );
-	glVertexAttribPointer( vPosition,2,GL_FLOAT,GL_FALSE,0,0 );
+	GLint  vPosition = glGetAttribLocation(program, "vPosition");
+	glEnableVertexAttribArray(vPosition);
+	glVertexAttribPointer(vPosition, 2, GL_FLOAT, GL_FALSE, 0, 0);
 
 	// Same for texture coordinates data.
-	GLint  vTexCoord = glGetAttribLocation( program, "vTexCoord" );
-	glEnableVertexAttribArray( vTexCoord );
-	glVertexAttribPointer( vTexCoord,2,GL_FLOAT,GL_FALSE,0,(GLvoid *)sizeof(vtc) );
+	GLint  vTexCoord = glGetAttribLocation(program, "vTexCoord");
+	glEnableVertexAttribArray(vTexCoord);
+	glVertexAttribPointer(vTexCoord, 2, GL_FLOAT, GL_FALSE, 0, (GLvoid*)sizeof(vtc));
 
 	//glProgramUniform1i( program, glGetUniformLocation(program, "texture"), 0 );
 
 	// Tells the shader to use GL_TEXTURE0 as the texture id.
-	glUniform1i(glGetUniformLocation(program, "texture"),0);
+	glUniform1i(glGetUniformLocation(program, "texture"), 0);
 }
 
 void Renderer::CreateOpenglBuffer()
@@ -316,10 +314,44 @@ void Renderer::Render(const Scene& scene)
 	int half_height = viewport_height / 2;
 
 	// draw circle
-	DrawCircle(glm::ivec2(CENTER_X, CENTER_Y), 150, 36);
+	//DrawCircle(glm::ivec2(half_width, half_height), 150, 36);
 
 	// draw cat
 	//DrawCat(CAT_SCALE);
+
+	int numOfModels = scene.GetModelCount();
+
+	glm::vec3 color = glm::vec3(0, 0, 0);
+
+	for (int i = 0; i < numOfModels; i++) {
+		MeshModel& model = scene.GetModel(i);
+		const std::vector<glm::vec3> vertices = model.getTransformedVertices();
+		int facesCount = model.GetFacesCount();
+		int counter = 0;
+		for (int j = 0; j < facesCount; j++) {
+			Face face = model.GetFace(j);
+			int v1Index = face.GetVertexIndex(0) - 1;
+			int v2Index = face.GetVertexIndex(1) - 1;
+			int v3Index = face.GetVertexIndex(2) - 1;
+
+			glm::vec2 v1 = vertices.at(v1Index);
+			glm::vec2 v2 = vertices.at(v2Index);
+			glm::vec2 v3 = vertices.at(v3Index);
+
+			v1.x += half_width;
+			v2.x += half_width;
+			v3.x += half_width;
+
+			v1.y += half_height;
+			v2.y += half_height;
+			v3.y += half_height;
+			
+			DrawLine(v1, v2, color);
+			DrawLine(v2, v3, color);
+			DrawLine(v1, v3, color);
+
+		}
+	}
 }
 
 int Renderer::GetViewportWidth() const
@@ -330,4 +362,11 @@ int Renderer::GetViewportWidth() const
 int Renderer::GetViewportHeight() const
 {
 	return viewport_height;
+}
+
+void Renderer::setViewportWidth(const int width) {
+	this->viewport_width = width;
+}
+void Renderer::setViewportHeight(const int height) {
+	this->viewport_height = height;
 }

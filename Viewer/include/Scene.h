@@ -2,6 +2,7 @@
 
 #include <vector>
 #include <memory>
+#include <iostream>
 
 #include "Camera.h"
 #include "MeshModel.h"
@@ -16,7 +17,7 @@ public:
 	int GetModelCount() const;
 	MeshModel& GetModel(int index) const;
 	MeshModel& GetActiveModel() const;
-	
+
 	void AddCamera(const shared_ptr<Camera>& camera);
 	int GetCameraCount() const;
 	Camera& GetCamera(int index);
@@ -27,7 +28,9 @@ public:
 
 	void SetActiveModelIndex(int index);
 	int GetActiveModelIndex() const;
-	
+
+	std::vector<std::string> modelsNames;
+
 private:
 	vector<shared_ptr<MeshModel>> mesh_models;
 	vector<shared_ptr<Camera>> cameras;

@@ -4,12 +4,12 @@
 
 Name: Saji Assi
 
-Student Number: 314831207
+Github: SajiAssi
 
 
 Name: Waseem tannous
 
-Student Number: 207866328
+Website: waseemtannous.com
 
 ### Lecturer
 *Roi Poranne*

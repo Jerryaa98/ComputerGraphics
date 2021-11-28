@@ -22,6 +22,7 @@ glm::vec2 Utils::Vec2fFromStream(std::istream& issLine)
 
 std::shared_ptr<MeshModel> Utils::LoadMeshModel(const std::string& filePath)
 {
+	
 	std::vector<Face> faces;
 	std::vector<glm::vec3> vertices;
 	std::vector<glm::vec3> normals;
@@ -44,7 +45,6 @@ std::shared_ptr<MeshModel> Utils::LoadMeshModel(const std::string& filePath)
 		if (lineType == "v")
 		{
 			vertices.push_back(Utils::Vec3fFromStream(issLine));
-			std::cout << issLine.str() << std::endl;
 		}
 		else if (lineType == "vn")
 		{
@@ -57,7 +57,6 @@ std::shared_ptr<MeshModel> Utils::LoadMeshModel(const std::string& filePath)
 		else if (lineType == "f")
 		{
 			faces.push_back(Face(issLine));
-			std::cout << issLine.str() << std::endl;
 		}
 		else if (lineType == "#" || lineType == "")
 		{
@@ -65,10 +64,9 @@ std::shared_ptr<MeshModel> Utils::LoadMeshModel(const std::string& filePath)
 		}
 		else
 		{
-			std::cout << "Found unknown line Type \"" << lineType << "\"";
+			//std::cout << "Found unknown line Type \"" << lineType << "\"";
 		}
 	}
-
 	return std::make_shared<MeshModel>(faces, vertices, normals, Utils::GetFileName(filePath));
 }
 

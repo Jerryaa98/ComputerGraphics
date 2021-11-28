@@ -32,7 +32,7 @@ We added a print statement to the code as asked to see that the function reads t
 		}
 ```
 This is the output of the function (also the faces were printed down in the cmd window):
-![N|Solid](objPrint.png)
+![N|Solid](Assignment1B/objPrint.png)
 
 
 **In order to fit the object in the window, we added a scale factor to the vertices and translated the object to the center of the window.**
@@ -113,11 +113,11 @@ Now we are able to draw the object on the screen.
 
 **banana.obj:**
 
-![N|Solid](banana.png)
+![N|Solid](Assignment1B/banana.png)
 
 
 ## GUI Items:
-![N|Solid](UI_sliders.png)
+![N|Solid](Assignment1B/UI_sliders.png)
 
 The first item in the GUI enables you to select which object to apply the transformations to.
 
@@ -130,11 +130,11 @@ We also implemented mouse interactions on the object directly. Clicking and drag
 Keyborad interactions are also implemented. Pressing the 'w' key will translate the object up, the 's' key will translate the object down, the 'a' key will translate the object left and the 'd' key will translate the object right (locally).
 
 **Here is a gif to show the GUI interactions:**
-![N|Solid](GUI_transformations.gif)
+![N|Solid](Assignment1B/GUI_transformations.gif)
 
 
 **Here is a gif to show the mouse and keyboard (w,a,s,d) interactions:**
-![N|Solid](mouse_keyboard_transformations.gif)
+![N|Solid](Assignment1B/mouse_keyboard_transformations.gif)
 
 ## World vs Local Transformations:
 
@@ -147,9 +147,9 @@ The world axis system is always centered in the middle of the window, so every t
 **local translate and world rotate:**
 Here we are rotating the object around itself and its world positioning is irrelevant to the rotation.
 
-![N|Solid](local_translate_world_rotate.gif)
+![N|Solid](Assignment1B/local_translate_world_rotate.gif)
 
 Here we are rotating the object relative to a the axis centered in the middle of the window (world).
 
 **world translate and local rotate:**
-![N|Solid](world_translate_local_rotate.gif)
+![N|Solid](Assignment1B/world_translate_local_rotate.gif)

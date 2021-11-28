@@ -18,9 +18,12 @@
  */
 bool show_demo_window = false;
 bool show_another_window = false;
-glm::vec4 clear_color = glm::vec4(0.8f, 0.8f, 0.8f, 1.00f);
+glm::vec4 clear_color = glm::vec4(0.117f, 0.117f, 0.117f, 0.117f);
 ImVec2 oldCoordinates;
 float oldMouseWheelPos;
+int LocalWorldEditCamera = 1;
+bool cameraT = true;
+std::shared_ptr<MeshModel> cameraModel;
 
 /**
  * Function declarations
@@ -55,6 +58,9 @@ int main(int argc, char** argv)
 
 	Renderer renderer = Renderer(frameBufferWidth, frameBufferHeight);
 	Scene scene = Scene();
+	shared_ptr<Camera>& camera = std::make_shared<Camera>();
+	scene.AddCamera(camera);
+	cameraModel = Utils::LoadMeshModel("..\\Data\\camera.obj");
 
 	ImGuiIO& io = SetupDearImgui(window);
 	glfwSetScrollCallback(window, ScrollCallback);
@@ -125,7 +131,17 @@ void RenderFrame(GLFWwindow* window, Scene& scene, Renderer& renderer, ImGuiIO& 
 
 	if (frameBufferWidth != renderer.GetViewportWidth() || frameBufferHeight != renderer.GetViewportHeight())
 	{
-		// TODO: Set new aspect ratio
+		// Set new aspect ratio
+		//if (frameBufferWidth > 1080) {
+		//	frameBufferWidth = 1080;
+		//}
+		//if (frameBufferHeight > 720) {
+		//	frameBufferHeight = 720;
+		//}
+		//renderer.setViewportWidth(frameBufferWidth);
+		//renderer.setViewportHeight(frameBufferHeight);
+
+		Renderer renderer = Renderer(frameBufferWidth, frameBufferHeight);
 	}
 
 	if (!io.WantCaptureKeyboard)
@@ -167,6 +183,24 @@ void RenderFrame(GLFWwindow* window, Scene& scene, Renderer& renderer, ImGuiIO& 
 				model.localTranslateArray[0] += 20;
 			}
 		}
+
+		//J
+		if (io.KeysDown[74] || io.KeysDown[106])
+		{
+			if (scene.GetCameraCount() > 0) {
+				Camera& camera = scene.GetActiveCamera();
+				camera.IncrementalTrans(true);
+			}
+		}
+
+		//L
+		if (io.KeysDown[76] || io.KeysDown[108])
+		{
+			if (scene.GetCameraCount() > 0) {
+				Camera& camera = scene.GetActiveCamera();
+				camera.IncrementalTrans(false);
+			}
+		}
 	}
 
 	if (!io.WantCaptureMouse)
@@ -178,8 +212,11 @@ void RenderFrame(GLFWwindow* window, Scene& scene, Renderer& renderer, ImGuiIO& 
 			// Left mouse button is down
 			if (scene.GetModelCount() > 0) {
 				MeshModel& model = scene.GetActiveModel();
-				model.localRotateArray[1] += newCoordinates[0] - oldCoordinates[0];
-				model.localRotateArray[0] += newCoordinates[1] - oldCoordinates[1];
+				//model.localRotateArray[1] += newCoordinates[0] - oldCoordinates[0];
+				//model.localRotateArray[0] += newCoordinates[1] - oldCoordinates[1];
+
+				scene.GetActiveCamera().worldRotateArray[1] += (newCoordinates[0] - oldCoordinates[0]) / 10;
+				scene.GetActiveCamera().worldRotateArray[0] += (newCoordinates[1] - oldCoordinates[1]) / 10;
 			}
 			
 			
@@ -213,7 +250,7 @@ void RenderFrame(GLFWwindow* window, Scene& scene, Renderer& renderer, ImGuiIO& 
 	}
 
 	renderer.ClearColorBuffer(clear_color);
-	renderer.Render(scene);
+	renderer.Render(scene, cameraModel);
 	renderer.SwapBuffers();
 
 	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
@@ -236,9 +273,8 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 	/**
 	 * MeshViewer menu
 	 */
-	ImGui::Begin("MeshViewer Menu");
-
-	// Menu Bar
+	
+	 // Menu Bar
 	if (ImGui::BeginMainMenuBar())
 	{
 		if (ImGui::BeginMenu("File"))
@@ -260,18 +296,15 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 				}
 
 			}
+
 			ImGui::EndMenu();
 		}
 
 		// TODO: Add more menubar items (if you want to)
 		ImGui::EndMainMenuBar();
 	}
-
-	// Controls
-	ImGui::ColorEdit3("Clear Color", (float*)&clear_color);
-	// TODO: Add more controls as needed
-
-	ImGui::End();
+	
+	
 
 	/**
 	 * Imgui demo - you can remove it once you are familiar with imgui
@@ -281,87 +314,279 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 	if (show_demo_window)
 		ImGui::ShowDemoWindow(&show_demo_window);
 
-	// 2. Show a simple window that we create ourselves. We use a Begin/End pair to created a named window.
-	{
-		static float f = 0.0f;
-		static int counter = 0;
 
-		ImGui::Begin("Hello, world!");                          // Create a window called "Hello, world!" and append into it.
-
-		ImGui::Text("This is some useful text.");               // Display some text (you can use a format strings too)
-		ImGui::Checkbox("Demo Window", &show_demo_window);      // Edit bools storing our window open/close state
-		ImGui::Checkbox("Another Window", &show_another_window);
-
-		ImGui::SliderFloat("float", &f, 0.0f, 1.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
-		ImGui::ColorEdit3("clear color", (float*)&clear_color); // Edit 3 floats representing a color
-
-		if (ImGui::Button("Button"))                            // Buttons return true when clicked (most widgets return true when edited/activated)
-			counter++;
-		ImGui::SameLine();
-		ImGui::Text("counter = %d", counter);
-
-		ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
-		ImGui::End();
-	}
-
-	// 3. Show another simple window.
-	if (show_another_window)
-	{
-		ImGui::Begin("Another Window", &show_another_window);   // Pass a pointer to our bool variable (the window will have a closing button that will clear the bool when clicked)
-		ImGui::Text("Hello from another window!");
-		if (ImGui::Button("Close Me"))
-			show_another_window = false;
-		ImGui::End();
-	}
-
+	
 	int modelCount = scene.GetModelCount();
-	// display transformations window if at least one model is loaded
-	if (modelCount) {
-		ImGui::Begin("Transformations Window");
+	
+	ImGui::Begin("Transformations");
 
-		ImGui::Text("Select Model:");
-
-		static int selected = 0;
-		for (int n = 0; n < modelCount; n++) {
-			char buf[64];
-			sprintf(buf, scene.modelsNames[n].c_str(), n);
-			if (ImGui::Selectable(buf, selected == n))
-				selected = n;
+	if (ImGui::BeginTabBar("Transformations"))
+	{
+		if (ImGui::BeginTabItem("General")) {
+			ImGui::ColorEdit3("Background color", (float*)&clear_color);
+			ImGui::Text("FPS %.1f", ImGui::GetIO().Framerate);
+			ImGui::EndTabItem();
 		}
 
-		scene.SetActiveModelIndex(selected);
-		MeshModel& model = scene.GetActiveModel();
+		if (ImGui::BeginTabItem("Camera")) {
 
-		ImGui::Text("--- LOCAL TRANSFORMATIONS ---");
-		ImGui::Text("Local Scale:");
-		ImGui::SliderFloat3("Local Scale", model.localScaleArray, 1, model.maxScale);
+			if (ImGui::Button("Add Camera")) {
+				shared_ptr<Camera>& newCam = std::make_shared<Camera>();
+				scene.AddCamera(newCam);
+			}
 
-		ImGui::Checkbox("Lock All Local Axis", &(model.lockLocalScale));
-
-		ImGui::SliderFloat("Local Scale Locked", &(model.localScaleLocked), 1, model.maxScale);
-
-		ImGui::Text("Local Translate:");
-		ImGui::SliderFloat3("Local Translate", model.localTranslateArray, -500, 500);
-
-		ImGui::Text("Local Rotate:");
-		ImGui::SliderFloat3("Local Rotate", model.localRotateArray, -360, 360);
+			ImGui::Text("Select Camera:");
+			int numCameras = scene.GetCameraCount();
 
 
-		ImGui::Text("--- WORLD TRANSFORMATIONS ---");
-		ImGui::Text("World Scale:");
-		ImGui::SliderFloat3("World Scale", model.worldScaleArray, 1, 1000);
+			static int selectedCamra = 0;
+			for (int n = 0; n < numCameras; n++) {
+				std::string camName = "Camera ";
+				camName.append(std::to_string(n));
+				char bufc[64];
+				sprintf(bufc, camName.c_str(), n);
+				if (ImGui::Selectable(bufc, selectedCamra == n))
+					selectedCamra = n;
+			}
 
-		ImGui::Checkbox("Lock All World Axis", &(model.lockWorldScale));
-		ImGui::SliderFloat("World Scale Locked", &(model.worldScaleLocked), 1, 1000);
+			scene.SetActiveCameraIndex(selectedCamra);
 
-		
-		ImGui::Text("World Translate:");
-		ImGui::SliderFloat3("World Translate", model.worldTranslateArray, -500, 500);
-		
-		ImGui::Text("World Rotate:");
-		ImGui::SliderFloat3("World Rotate", model.worldRotateArray, -360, 360);
+			Camera& camera = scene.GetCamera(selectedCamra);
 
-		ImGui::End();
+			ImGui::Separator();
+			ImGui::Separator();
+			ImGui::Separator();
+			ImGui::Separator();
+
+			ImGui::InputFloat("Camera Scale", &(*cameraModel).localScaleLocked, 0.01, 0.01, "%.2f");
+
+			ImGui::Separator();
+			ImGui::Separator();
+			ImGui::Separator();
+			ImGui::Separator();
+
+			ImGui::Text("--- CAMERA LOCATION (EYE) ---");
+
+			ImGui::InputFloat("Location X", &camera.eye[0], 0.1, 5, "%.2f");
+			ImGui::InputFloat("Location Y", &camera.eye[1], 0.1, 5, "%.2f");
+			ImGui::InputFloat("Location Z", &camera.eye[2], 0.1, 5, "%.2f");
+
+			ImGui::Separator();
+
+			ImGui::Text("--- CAMERA TARGET (AT) ---");
+
+			ImGui::InputFloat("Target X", &camera.at[0], 0.1, 1, "%.2f");
+			ImGui::InputFloat("Target Y", &camera.at[1], 0.1, 1, "%.2f");
+			ImGui::InputFloat("Target Z", &camera.at[2], 0.1, 1, "%.2f");
+
+			ImGui::Separator();
+			ImGui::Separator();
+			ImGui::Separator();
+			ImGui::Separator();
+
+			ImGui::Text("Transformation Type:");
+			ImGui::SameLine();
+			ImGui::RadioButton("Local", &LocalWorldEditCamera, 1);
+			ImGui::SameLine();
+			ImGui::RadioButton("world", &LocalWorldEditCamera, 0);
+
+			if (LocalWorldEditCamera) {
+				ImGui::Text("--- LOCAL TRANSFORMATIONS ---");
+
+				ImGui::Text("Local Translate:");
+				ImGui::InputFloat("Local Translate X", &camera.localTranslateArray[0], 0.1, 5, "%.2f");
+				ImGui::InputFloat("Local Translate Y", &camera.localTranslateArray[1], 0.1, 5, "%.2f");
+				ImGui::InputFloat("Local Translate Z", &camera.localTranslateArray[2], 0.1, 5, "%.2f");
+
+				ImGui::Separator();
+
+				ImGui::Text("Local Rotate:");
+				ImGui::InputFloat("Rotate X", &camera.localRotateArray[0], 0.1, 1, "%.2f");
+				ImGui::InputFloat("Rotate Y", &camera.localRotateArray[1], 0.1, 1, "%.2f");
+				ImGui::InputFloat("Rotate Z", &camera.localRotateArray[2], 0.1, 1, "%.2f");
+
+				ImGui::Separator();
+				ImGui::Separator();
+				ImGui::Separator();
+				ImGui::Separator();
+			}
+			else {
+				ImGui::Text("--- WORLD TRANSFORMATIONS ---");
+				ImGui::Text("World Translate:");
+				ImGui::InputFloat("World Translate X", &camera.worldTranslateArray[0], 0.1, 5, "%.2f");
+				ImGui::InputFloat("World Translate Y", &camera.worldTranslateArray[1], 0.1, 5, "%.2f");
+				ImGui::InputFloat("World Translate Z", &camera.worldTranslateArray[2], 0.1, 5, "%.2f");
+
+				ImGui::Separator();
+
+				ImGui::Text("World Rotate:");
+				ImGui::InputFloat("Rotate X", &camera.worldRotateArray[0], 0.1, 1, "%.2f");
+				ImGui::InputFloat("Rotate Y", &camera.worldRotateArray[1], 0.1, 1, "%.2f");
+				ImGui::InputFloat("Rotate Z", &camera.worldRotateArray[2], 0.1, 1, "%.2f");
+
+				ImGui::Separator();
+				ImGui::Separator();
+				ImGui::Separator();
+				ImGui::Separator();
+			}
+
+			ImGui::Text("View Type:");
+			ImGui::SameLine();
+			ImGui::RadioButton("Orthographic", &(camera.OrthoPerspective), 1);
+			ImGui::SameLine();
+			ImGui::RadioButton("Perspective", &(camera.OrthoPerspective), 0);
+
+			if (camera.OrthoPerspective) {
+				ImGui::Text("Orthographic Settings:");
+				ImGui::InputFloat("Camera near", &(camera.nearVal), 0.01f, 1.0f, "%.3f");
+				ImGui::InputFloat("Camera far", &(camera.farVal), 0.01f, 1.0f, "%.3f");
+				ImGui::InputFloat("Camera top", &(camera.top), 0.01f, 1.0f, "%.3f");
+				ImGui::InputFloat("Camera bottom", &(camera.bottom), 0.01f, 1.0f, "%.3f");
+				ImGui::InputFloat("Camera right", &(camera.right), 0.01f, 1.0f, "%.3f");
+				ImGui::InputFloat("Camera left", &(camera.left), 0.01f, 1.0f, "%.3f");
+			}
+			else {
+				ImGui::InputFloat("Camera near", &(camera.nearVal), 0.01f, 1.0f, "%.3f");
+				ImGui::InputFloat("Camera far", &(camera.farVal), 0.01f, 1.0f, "%.3f");
+				ImGui::InputFloat("Camera FOV", &(camera.fov), 1, 1, "%.0f");
+			}
+
+			ImGui::Separator();
+			ImGui::Separator();
+			ImGui::Separator();
+			ImGui::Separator();
+
+
+			ImGui::Text("Addons:");
+			ImGui::Checkbox("Draw World Axis", &(scene.drawWorldAxis));
+
+			ImGui::EndTabItem();
+		}
+
+		if (ImGui::BeginTabItem("Object"))
+		{
+			// display transformations window if at least one model is loaded
+			if (modelCount) {
+
+				ImGui::Text("Select Model:");
+
+				static int selected = 0;
+				for (int n = 0; n < modelCount; n++) {
+					char buf[64];
+					sprintf(buf, scene.modelsNames[n].c_str(), n);
+					if (ImGui::Selectable(buf, selected == n))
+						selected = n;
+				}
+
+				scene.SetActiveModelIndex(selected);
+				MeshModel& model = scene.GetActiveModel();
+
+				ImGui::Text("Transformation Type:");
+				ImGui::SameLine();
+				ImGui::RadioButton("Local", &(model.LocalWorldEditObject), 1);
+				ImGui::SameLine();
+				ImGui::RadioButton("world", &(model.LocalWorldEditObject), 0);
+
+
+				if (model.LocalWorldEditObject) {
+					ImGui::Text("--- LOCAL TRANSFORMATIONS ---");
+					ImGui::Text("Local Scale:");
+					ImGui::InputFloat("Local Scale X", &model.localScaleArray[0], 0.1f, 1.0f, "%.3f");
+					ImGui::InputFloat("Local Scale Y", &model.localScaleArray[1], 0.1f, 1.0f, "%.3f");
+					ImGui::InputFloat("Local Scale Z", &model.localScaleArray[2], 0.1f, 1.0f, "%.3f");
+
+					ImGui::Separator();
+
+					ImGui::Checkbox("Lock All Local Axis", &(model.lockLocalScale));
+					ImGui::InputFloat("Local Scale Locked", &(model.localScaleLocked), 0.1f, 1.0f, "%.3f");
+
+					ImGui::Separator();
+					ImGui::Separator();
+					ImGui::Separator();
+					ImGui::Separator();
+
+					ImGui::Text("Local Translate:");
+					ImGui::InputFloat("Local Translate X", &model.localTranslateArray[0], 0.05, 1, "%.2f");
+					ImGui::InputFloat("Local Translate Y", &model.localTranslateArray[1], 0.05, 1, "%.2f");
+					ImGui::InputFloat("Local Translate Z", &model.localTranslateArray[2], 0.05, 1, "%.2f");
+
+					ImGui::Separator();
+					ImGui::Separator();
+					ImGui::Separator();
+					ImGui::Separator();
+
+					ImGui::Text("Local Rotate:");
+					ImGui::InputFloat("Local Rotate X", &model.localRotateArray[0], 1, 1, "%.0f");
+					ImGui::InputFloat("Local Rotate Y", &model.localRotateArray[1], 1, 1, "%.0f");
+					ImGui::InputFloat("Local Rotate Z", &model.localRotateArray[2], 1, 1, "%.0f");
+
+					ImGui::Separator();
+					ImGui::Separator();
+					ImGui::Separator();
+					ImGui::Separator();
+				}
+				else {
+					ImGui::Text("--- WORLD TRANSFORMATIONS ---");
+					ImGui::Text("World Scale:");
+					ImGui::InputFloat("World Scale X", &model.worldScaleArray[0], 0.1f, 1.0f, "%.3f");
+					ImGui::InputFloat("World Scale Y", &model.worldScaleArray[1], 0.1f, 1.0f, "%.3f");
+					ImGui::InputFloat("World Scale Z", &model.worldScaleArray[2], 0.1f, 1.0f, "%.3f");
+
+					ImGui::Separator();
+
+					ImGui::Checkbox("Lock All World Axis", &(model.lockWorldScale));
+					ImGui::InputFloat("World Scale Locked", &(model.worldScaleLocked), 0.1f, 1.0f, "%.3f");
+
+					ImGui::Separator();
+					ImGui::Separator();
+					ImGui::Separator();
+					ImGui::Separator();
+
+
+					ImGui::Text("World Translate:");
+					ImGui::InputFloat("World Translate X", &model.worldTranslateArray[0], 0.05, 1, "%.2f");
+					ImGui::InputFloat("World Translate Y", &model.worldTranslateArray[1], 0.05, 1, "%.2f");
+					ImGui::InputFloat("World Translate Z", &model.worldTranslateArray[2], 0.05, 1, "%.2f");
+
+					ImGui::Separator();
+					ImGui::Separator();
+					ImGui::Separator();
+					ImGui::Separator();
+
+					ImGui::Text("World Rotate:");
+					ImGui::InputFloat("World Rotate X", &model.worldRotateArray[0], 1, 1, "%.0f");
+					ImGui::InputFloat("World Rotate Y", &model.worldRotateArray[1], 1, 1, "%.0f");
+					ImGui::InputFloat("World Rotate Z", &model.worldRotateArray[2], 1, 1, "%.0f");
+
+					ImGui::Separator();
+					ImGui::Separator();
+					ImGui::Separator();
+					ImGui::Separator();
+
+				}
+				ImGui::Text("Object Addons:");
+				ImGui::Checkbox("Draw Axis", &(model.drawAxis));
+				ImGui::Separator();
+				ImGui::Checkbox("Draw Bounding Box", &(model.drawBoundingBox));
+				ImGui::Separator();
+				ImGui::Checkbox("Draw Vertex Normals", &(model.drawVertexNormals));
+				ImGui::InputFloat("Vertex Normals Scale", &(model.vertexNormalsScale), 0.05, 1, "%.2f");
+				ImGui::Separator();
+				ImGui::Checkbox("Draw Face Normals", &(model.drawFaceNormals));
+				ImGui::InputFloat("Face Normals Scale", &(model.faceNormalsScale), 0.0001, 1, "%.4f");
+
+			}
+			ImGui::EndTabItem();
+		}
+
+		ImGui::EndTabBar();
 	}
+	ImGui::End();
+
+
+	
+
+	
+
 
 }

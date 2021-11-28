@@ -38,6 +38,7 @@ MeshModel& Scene::GetActiveModel() const
 void Scene::AddCamera(const std::shared_ptr<Camera>& camera)
 {
 	cameras.push_back(camera);
+	SetActiveCameraIndex(cameras.size() - 1);
 }
 
 int Scene::GetCameraCount() const

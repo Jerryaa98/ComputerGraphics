@@ -6,6 +6,7 @@
 
 #include "Camera.h"
 #include "MeshModel.h"
+#include "Utils.h"
 
 using namespace std;
 
@@ -30,6 +31,8 @@ public:
 	int GetActiveModelIndex() const;
 
 	std::vector<std::string> modelsNames;
+
+	bool drawWorldAxis = false;
 
 private:
 	vector<shared_ptr<MeshModel>> mesh_models;

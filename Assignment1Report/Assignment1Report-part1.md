@@ -6,12 +6,12 @@ Two more functions were implemented as auxiliary functions to help with the main
 As a sanity check, we drew a circle to check if our function works correctly with every line and degree possible.
 This is the result:
 
-![N|Solid](circle_a36.png)
+![N|Solid](Assignment1A/circle_a36.png)
 
 
 As an extra, we drew a cat using the line function we implemented. This is the result:
 
-![N|Solid](cat.png)
+![N|Solid](Assignment1A/cat.png)
 
 This is the implementation of the **Bresenham's line algorithm**:
 

@@ -13,9 +13,8 @@ public:
 	int GetFacesCount() const;
 	const std::string& GetModelName() const;
 
-	// TODO: implement these 2 functions
-	glm::mat4x4 GetTransform();
-	const std::vector<glm::vec3> getTransformedVertices();
+	void GetTransform();
+	std::vector<std::vector<glm::vec2>> Draw(glm::mat4x4 transformMat);
 
 	/*
 	use these variables to do transformations
@@ -23,21 +22,49 @@ public:
 	final matrices are calculaten in the GetTransform function
 	*/
 
+
 	float localTranslateArray[3] = { 0, 0, 0 };
 	float localRotateArray[3] = { 0, 0, 0 };
 	float localScaleArray[3] = { 1, 1, 1 };
-	bool lockLocalScale = false;
-	float localScaleLocked = 1;
+	bool lockLocalScale = true;
+	float localScaleLocked = 0.01;
 
 	float worldTranslateArray[3] = { 0, 0, 0 };
 	float worldRotateArray[3] = { 0, 0, 0 };
 	float worldScaleArray[3] = { 1, 1, 1 };
-	bool lockWorldScale = false;
+	bool lockWorldScale = true;
 	float worldScaleLocked = 1;
+
+	bool drawAxis = false;
+	bool drawBoundingBox = false;
+	bool drawVertexNormals = false;
+	bool drawFaceNormals = false;
+
+	float vertexNormalsScale = 0.05;
+	float faceNormalsScale = 0.001;
+
+	int LocalWorldEditObject = 1;
+
 
 	int maxScale = 0;
 
+	std::vector<glm::vec3> boundingBox;
+	std::vector<glm::vec3> axis;
+
+	std::vector<glm::vec2> transformedBoundingBox;
+	std::vector<glm::vec2> transformedAxis;
+	std::vector<std::vector<glm::vec2>> transformedVertexNormals;
+	std::vector<std::vector<glm::vec2>> transformedFaceNormals;
+
+	std::vector<Face> faces;
+	std::vector<glm::vec3> vertices;
+
+	glm::mat4x4 objectTransform;
+	glm::mat4x4 objectTransformation = glm::mat4x4(1.0f);
 private:
+
+	float maxCoordinates[3] = { -1.0f * FLT_MAX, -1.0f * FLT_MAX, -1.0f * FLT_MAX };
+	float minCoordinates[3] = { FLT_MAX, FLT_MAX, FLT_MAX };
 
 	// local matrices (init with identity matrix)
 	glm::mat4x4 localTranslateMat = glm::mat4x4(1.0f);
@@ -53,10 +80,11 @@ private:
 	glm::mat4x4 worldRotateZMat = glm::mat4x4(1.0f);
 	glm::mat4x4 worldScaleMat = glm::mat4x4(1.0f);
 
-	std::vector<Face> faces;
-	std::vector<glm::vec3> vertices;
+	// Transformation matrices
+	glm::mat4x4 axisTransformation = glm::mat4x4(1.0f);
+
+	
 	std::vector<glm::vec3> normals;
 	std::string model_name;
-	glm::mat4x4 objectTransform;
 	glm::mat4x4 worldTransform;
 };

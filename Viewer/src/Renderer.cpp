@@ -8,6 +8,12 @@
 #define INDEX(width,x,y,c) ((x)+(y)*(width))*3+(c)
 #define Z_INDEX(width,x,y) ((x)+(y)*(width))
 
+// Define the center point
+#define CENTER_X 640
+#define CENTER_Y 360
+
+# define CAT_SCALE 40
+
 Renderer::Renderer(int viewport_width, int viewport_height) :
 	viewport_width(viewport_width),
 	viewport_height(viewport_height)
@@ -31,10 +37,145 @@ void Renderer::PutPixel(int i, int j, const glm::vec3& color)
 	color_buffer[INDEX(viewport_width, i, j, 2)] = color.z;
 }
 
+void Renderer::DrawCircle(const glm::ivec2& center, const float radius, const int stepSize) {
+	glm::vec3 color = glm::vec3(1, 1, 1);
+
+	for (int i = 0; i < stepSize; i++) {
+		float x = center.x + (radius * (sin(((2 * M_PI * i) / stepSize))));
+		float y = center.y + (radius * (cos(((2 * M_PI * i) / stepSize))));
+		glm::vec2 endPoint = glm::vec2(x, y);
+		DrawLine(center, endPoint, color);
+	}
+}
+
+
+void Renderer::DrawLineHigh(const glm::ivec2& p1, const glm::ivec2& p2, const glm::vec3& color) {
+	float dx = p2.x - p1.x;
+	float dy = p2.y - p1.y;
+	int xi = 1;
+	float d, x;
+
+	if (dx < 0) {
+		xi = -1;
+		dx = ((-1) * dx);
+	}
+
+	d = (2 * dx) - dy;
+	x = p1.x;
+	for (int y = p1.y; y < p2.y; y++) {
+		PutPixel(x, y, color);
+		if (d > 0) {
+			x += xi;
+			d += (2 * (dx - dy));
+		}
+		else {
+			d += (2 * dx);
+		}
+	}
+}
+
+void Renderer::DrawLineLow(const glm::ivec2& p1, const glm::ivec2& p2, const glm::vec3& color) {
+	float dx = p2.x - p1.x;
+	float dy = p2.y - p1.y;
+	int yi = 1;
+	float d, y;
+
+	if (dy < 0) {
+		yi = -1;
+		dy = ((-1) * dy);
+	}
+
+	d = (2 * dy) - dx;
+	y = p1.y;
+	for (int x = p1.x; x < p2.x; x++) {
+		PutPixel(x, y, color);
+		if (d > 0) {
+			y += yi;
+			d += (2 * (dy - dx));
+		}
+		else {
+			d += (2 * dy);
+		}
+	}
+}
+
 void Renderer::DrawLine(const glm::ivec2& p1, const glm::ivec2& p2, const glm::vec3& color)
 {
-	// TODO: Implement bresenham algorithm
-	// https://en.wikipedia.org/wiki/Bresenham%27s_line_algorithm
+	// bresenham algorithm https://en.wikipedia.org/wiki/Bresenham%27s_line_algorithm
+
+	float dx = abs(p1.x - p2.x);
+	float dy = abs(p1.y - p2.y);
+	
+	if (dy < dx) {
+		if (p1.x > p2.x){
+			DrawLineLow(p2, p1, color);
+			return;
+		}
+		else {
+			DrawLineLow(p1, p2, color);
+			return;
+		}
+	}
+	else {
+		if (p1.y > p2.y) {
+			DrawLineHigh(p2, p1, color);
+			return;
+		}
+		else {
+			DrawLineHigh(p1, p2, color);
+			return;
+		}
+	}
+
+
+}
+
+void Renderer::DrawCat(const int scale) {
+	glm::vec3 color = glm::vec3(1, 1, 1);
+
+	DrawLine(glm::vec2(scale * 0, scale * 8), glm::vec2(scale * 0, scale * 12), color);
+	DrawLine(glm::vec2(scale * 0, scale * 12), glm::vec2(scale * 3, scale * 15), color);
+	DrawLine(glm::vec2(scale * 3, scale * 15), glm::vec2(scale * 5, scale * 15), color);
+	DrawLine(glm::vec2(scale * 5, scale * 15), glm::vec2(scale * 5, scale * 14), color);
+	DrawLine(glm::vec2(scale * 5, scale * 14), glm::vec2(scale * 3, scale * 12), color);
+	DrawLine(glm::vec2(scale * 3, scale * 12), glm::vec2(scale * 2, scale * 12), color);
+	DrawLine(glm::vec2(scale * 2, scale * 12), glm::vec2(scale * 2, scale * 9), color);
+	DrawLine(glm::vec2(scale * 2, scale * 9), glm::vec2(scale * 4, scale * 11), color);
+	DrawLine(glm::vec2(scale * 4, scale * 11), glm::vec2(scale * 6, scale * 11), color);
+	DrawLine(glm::vec2(scale * 6, scale * 11), glm::vec2(scale * 8, scale * 9), color);
+	DrawLine(glm::vec2(scale * 8, scale * 9), glm::vec2(scale * 8, scale * 13), color);
+	DrawLine(glm::vec2(scale * 8, scale * 13), glm::vec2(scale * 10, scale * 11), color);
+	DrawLine(glm::vec2(scale * 10, scale * 11), glm::vec2(scale * 14, scale * 11), color);
+	DrawLine(glm::vec2(scale * 14, scale * 11), glm::vec2(scale * 16, scale * 13), color);
+	DrawLine(glm::vec2(scale * 16, scale * 13), glm::vec2(scale * 16, scale * 7), color);
+	DrawLine(glm::vec2(scale * 16, scale * 7), glm::vec2(scale * 15, scale * 6), color);
+	DrawLine(glm::vec2(scale * 15, scale * 6), glm::vec2(scale * 13, scale * 5), color);
+	DrawLine(glm::vec2(scale * 13, scale * 5), glm::vec2(scale * 11, scale * 5), color);
+	DrawLine(glm::vec2(scale * 11, scale * 5), glm::vec2(scale * 9, scale * 6), color);
+	DrawLine(glm::vec2(scale * 9, scale * 6), glm::vec2(scale * 8, scale * 7), color);
+	DrawLine(glm::vec2(scale * 8, scale * 7), glm::vec2(scale * 8, scale * 4), color);
+	DrawLine(glm::vec2(scale * 8, scale * 4), glm::vec2(scale * 9, scale * 4), color);
+	DrawLine(glm::vec2(scale * 9, scale * 4), glm::vec2(scale * 9, scale * 2), color);
+	DrawLine(glm::vec2(scale * 9, scale * 2), glm::vec2(scale * 6, scale * 2), color);
+	DrawLine(glm::vec2(scale * 6, scale * 2), glm::vec2(scale * 6, scale * 6), color);
+	DrawLine(glm::vec2(scale * 6, scale * 6), glm::vec2(scale * 4, scale * 6), color);
+	DrawLine(glm::vec2(scale * 4, scale * 6), glm::vec2(scale * 3, scale * 5), color);
+	DrawLine(glm::vec2(scale * 3, scale * 5), glm::vec2(scale * 3, scale * 4), color);
+	DrawLine(glm::vec2(scale * 3, scale * 4), glm::vec2(scale * 5, scale * 4), color);
+	DrawLine(glm::vec2(scale * 5, scale * 4), glm::vec2(scale * 5, scale * 2), color);
+	DrawLine(glm::vec2(scale * 5, scale * 2), glm::vec2(scale * 1, scale * 2), color);
+	DrawLine(glm::vec2(scale * 1, scale * 2), glm::vec2(scale * 0, scale * 8), color);
+	DrawLine(glm::vec2(scale * 9, scale * 8), glm::vec2(scale * 9, scale * 10), color);
+	DrawLine(glm::vec2(scale * 9, scale * 10), glm::vec2(scale * 11, scale * 10), color);
+	DrawLine(glm::vec2(scale * 11, scale * 10), glm::vec2(scale * 11, scale * 8), color);
+	DrawLine(glm::vec2(scale * 11, scale * 8), glm::vec2(scale * 9, scale * 8), color);
+	DrawLine(glm::vec2(scale * 13, scale * 10), glm::vec2(scale * 15, scale * 10), color);
+	DrawLine(glm::vec2(scale * 15, scale * 10), glm::vec2(scale * 15, scale * 8), color);
+	DrawLine(glm::vec2(scale * 15, scale * 8), glm::vec2(scale * 13, scale * 8), color);
+	DrawLine(glm::vec2(scale * 13, scale * 8), glm::vec2(scale * 13, scale * 10), color);
+	DrawLine(glm::vec2(scale * 11, scale * 7), glm::vec2(scale * 12, scale * 8), color);
+	DrawLine(glm::vec2(scale * 12, scale * 8), glm::vec2(scale * 13, scale * 7), color);
+	DrawLine(glm::vec2(scale * 13, scale * 7), glm::vec2(scale * 11, scale * 7), color);
 }
 
 void Renderer::CreateBuffers(int w, int h)
@@ -173,8 +314,12 @@ void Renderer::Render(const Scene& scene)
 	// TODO: Replace this code with real scene rendering code
 	int half_width = viewport_width / 2;
 	int half_height = viewport_height / 2;
-	// draw circle
 
+	// draw circle
+	DrawCircle(glm::ivec2(CENTER_X, CENTER_Y), 150, 36);
+
+	// draw cat
+	//DrawCat(CAT_SCALE);
 }
 
 int Renderer::GetViewportWidth() const

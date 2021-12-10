@@ -18,16 +18,18 @@ public:
 	void setViewportHeight(const int height);
 
 	// this is used for sanity check
-	void DrawCircle(const glm::ivec2& center, const float radius, const int stepSize);
+	void DrawCircle(const glm::ivec3& center, const float radius, const int stepSize);
 
 	void CreateBuffers(int w, int h);
 private:
-	void PutPixel(const int i, const int j, const glm::vec3& color);
-	void DrawLine(const glm::ivec2& p1, const glm::ivec2& p2, const glm::vec3& color);
+	void PutPixel(const int i, const int j, const glm::vec3& color, float depth);
+	void DrawLine(const glm::ivec3& p1, const glm::ivec3& p2, const glm::vec3& color);
 
 	// DrawLine helpers
-	void DrawLineHigh(const glm::ivec2& p1, const glm::ivec2& p2, const glm::vec3& color);
-	void DrawLineLow(const glm::ivec2& p1, const glm::ivec2& p2, const glm::vec3& color);
+	void DrawLineHigh(const glm::ivec3& p1, const glm::ivec3& p2, const glm::vec3& color);
+	void DrawLineLow(const glm::ivec3& p1, const glm::ivec3& p2, const glm::vec3& color);
+	
+	void DrawTriangle(glm::vec3& p1, glm::vec3& p2, glm::vec3& p3, glm::vec3& color, bool trianglesBoundingBoxes);
 
 
 	void DrawCat(const int scale);
@@ -36,6 +38,7 @@ private:
 	void InitOpenglRendering();
 
 	float* color_buffer;
+	float* z_buffer;
 	int viewport_width;
 	int viewport_height;
 	GLuint gl_screen_tex;

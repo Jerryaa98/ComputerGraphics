@@ -574,6 +574,8 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 				ImGui::Separator();
 				ImGui::Checkbox("Draw Face Normals", &(model.drawFaceNormals));
 				ImGui::InputFloat("Face Normals Scale", &(model.faceNormalsScale), 0.0001, 1, "%.4f");
+				ImGui::Separator();
+				ImGui::Checkbox("Triangles Bounding Boxes", &(model.trianglesBoundingBoxes));
 
 			}
 			ImGui::EndTabItem();

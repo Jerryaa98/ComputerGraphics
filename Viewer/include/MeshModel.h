@@ -14,7 +14,7 @@ public:
 	const std::string& GetModelName() const;
 
 	void GetTransform();
-	std::vector<std::vector<glm::vec2>> Draw(glm::mat4x4 transformMat);
+	std::vector<glm::vec3> Draw(glm::mat4x4 transformMat);
 
 	/*
 	use these variables to do transformations
@@ -45,16 +45,18 @@ public:
 
 	int LocalWorldEditObject = 1;
 
+	bool trianglesBoundingBoxes = false;
+
 
 	int maxScale = 0;
 
 	std::vector<glm::vec3> boundingBox;
 	std::vector<glm::vec3> axis;
 
-	std::vector<glm::vec2> transformedBoundingBox;
-	std::vector<glm::vec2> transformedAxis;
-	std::vector<std::vector<glm::vec2>> transformedVertexNormals;
-	std::vector<std::vector<glm::vec2>> transformedFaceNormals;
+	std::vector<glm::vec3> transformedBoundingBox;
+	std::vector<glm::vec3> transformedAxis;
+	std::vector<std::vector<glm::vec3>> transformedVertexNormals;
+	std::vector<std::vector<glm::vec3>> transformedFaceNormals;
 
 	std::vector<Face> faces;
 	std::vector<glm::vec3> vertices;

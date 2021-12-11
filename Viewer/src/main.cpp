@@ -576,7 +576,10 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 				ImGui::InputFloat("Face Normals Scale", &(model.faceNormalsScale), 0.0001, 1, "%.4f");
 				ImGui::Separator();
 				ImGui::Checkbox("Triangles Bounding Boxes", &(model.trianglesBoundingBoxes));
-
+				ImGui::Separator();
+				ImGui::Checkbox("Colored Triangles", &(model.coloredTriangles));
+				ImGui::Separator();
+				ImGui::Checkbox("Triangles Outline", &(model.trianglesOutlines));
 			}
 			ImGui::EndTabItem();
 		}

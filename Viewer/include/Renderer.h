@@ -25,11 +25,16 @@ private:
 	void PutPixel(const int i, const int j, const glm::vec3& color, float depth);
 	void DrawLine(const glm::ivec3& p1, const glm::ivec3& p2, const glm::vec3& color);
 
+	bool pointInTriangle(const glm::ivec2& curr_point, const glm::ivec2& p1, const glm::ivec2& p2, const glm::ivec2& p3);
+
+	float triangleArea(glm::vec3 v, glm::vec3 u, glm::vec2 w);
+
+
 	// DrawLine helpers
 	void DrawLineHigh(const glm::ivec3& p1, const glm::ivec3& p2, const glm::vec3& color);
 	void DrawLineLow(const glm::ivec3& p1, const glm::ivec3& p2, const glm::vec3& color);
 	
-	void DrawTriangle(glm::vec3& p1, glm::vec3& p2, glm::vec3& p3, glm::vec3& color, bool trianglesBoundingBoxes);
+	void DrawTriangle(glm::vec3& p1, glm::vec3& p2, glm::vec3& p3, glm::vec3& color, MeshModel& model);
 
 
 	void DrawCat(const int scale);

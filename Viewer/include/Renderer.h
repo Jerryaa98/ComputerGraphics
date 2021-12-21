@@ -21,6 +21,10 @@ public:
 	void DrawCircle(const glm::ivec3& center, const float radius, const int stepSize);
 
 	void CreateBuffers(int w, int h);
+
+	float maxZ = -1.0f * FLT_MAX;
+	float minZ = FLT_MAX;
+
 private:
 	void PutPixel(const int i, const int j, const glm::vec3& color, float depth);
 	void DrawLine(const glm::ivec3& p1, const glm::ivec3& p2, const glm::vec3& color);

@@ -314,7 +314,9 @@ void Renderer::DrawTriangle(glm::vec3& p1, glm::vec3& p2, glm::vec3& p3, glm::ve
 		DrawLine(p1, p3, glm::vec3(1, 1, 1));
 	}
 
-	glm::vec3 randomColor = glm::vec3((float)rand() / RAND_MAX, (float)rand() / RAND_MAX, (float)rand() / RAND_MAX);
+	//glm::vec3 randomColor = glm::vec3((float)rand() / RAND_MAX, (float)rand() / RAND_MAX, (float)rand() / RAND_MAX);
+	glm::vec3 randomColor = glm::vec3(0, 0, 1);
+	
 	float xMin = min(min(p1.x, p2.x), p3.x);
 	float yMin = min(min(p1.y, p2.y), p3.y);
 
@@ -351,7 +353,9 @@ void Renderer::DrawTriangle(glm::vec3& p1, glm::vec3& p2, glm::vec3& p3, glm::ve
 
 					float A = a1 + a2 + a3;
 					float z = ((a1 * p3.z) / A) + ((a2 * p1.z) / A) + ((a3 * p2.z) / A);
-					PutPixel(x, y, randomColor, z);
+					float interpolation = 1.0f - ((this->maxZ - z) / (this->maxZ - this->minZ));
+					
+					PutPixel(x, y, randomColor * interpolation, z);
 				}
 			}
 		}
@@ -382,7 +386,14 @@ void Renderer::Render(const Scene& scene, std::shared_ptr<MeshModel> cameraModel
 
 	glm::vec3 color = glm::vec3(255, 255, 255);
 
+	maxZ = -1.0f * FLT_MAX;
+	minZ = FLT_MAX;
 
+	for (int i = 0; i < numOfModels; i++) {
+		MeshModel& model = scene.GetModel(i);
+		this->maxZ = max(this->maxZ, model.maxZ);
+		this->minZ = min(this->minZ, model.minZ);
+	}
 
 	for (int i = 0; i < numOfModels; i++) {
 		MeshModel& model = scene.GetModel(i);

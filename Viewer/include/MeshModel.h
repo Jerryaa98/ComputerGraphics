@@ -22,7 +22,6 @@ public:
 	final matrices are calculaten in the GetTransform function
 	*/
 
-
 	float localTranslateArray[3] = { 0, 0, 0 };
 	float localRotateArray[3] = { 0, 0, 0 };
 	float localScaleArray[3] = { 1, 1, 1 };

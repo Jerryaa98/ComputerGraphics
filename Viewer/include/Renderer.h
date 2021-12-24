@@ -38,7 +38,7 @@ private:
 	void DrawLineHigh(const glm::ivec3& p1, const glm::ivec3& p2, const glm::vec3& color);
 	void DrawLineLow(const glm::ivec3& p1, const glm::ivec3& p2, const glm::vec3& color);
 	
-	void DrawTriangle(glm::vec3& p1, glm::vec3& p2, glm::vec3& p3, glm::vec3& color, MeshModel& model);
+	void DrawTriangle(glm::vec3& p1, glm::vec3& p2, glm::vec3& p3, MeshModel& model, int faceIndex, Scene& scene);
 
 
 	void DrawCat(const int scale);

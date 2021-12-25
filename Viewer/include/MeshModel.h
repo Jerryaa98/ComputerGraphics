@@ -65,6 +65,10 @@ public:
 	std::vector<Face> faces;
 	std::vector<glm::vec3> vertices;
 
+	glm::vec3 ambientColor = glm::vec3(1, 1, 1);
+	glm::vec3 diffuseColor = glm::vec3(95.0f / 256.0f, 59.0f / 256.0f, 59.0f / 256.0f);
+	glm::vec3 specularColor = glm::vec3(1, 1, 1);
+
 	glm::mat4x4 objectTransform;
 	glm::mat4x4 objectTransformation = glm::mat4x4(1.0f);
 

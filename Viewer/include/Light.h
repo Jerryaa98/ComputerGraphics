@@ -6,13 +6,10 @@
 class Light
 {
 public:
+	float alpha = 1;
 
 	glm::vec3 ambientColor = glm::vec3(1, 1, 1);
-
-
-	glm::vec3 diffuseColor = glm::vec3(1, 1, 1);
-
-
+	glm::vec3 diffuseColor = glm::vec3(1.0f / 256.0f, 1.0f  / 256.0f ,4.0f / 256.0f);
 	glm::vec3 specularColor = glm::vec3(1, 1, 1);
 
 	float localTranslateArray[3] = { 0, 0, 0 };

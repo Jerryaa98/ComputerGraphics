@@ -568,6 +568,15 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 				ImGui::Text("Object Addons:");
 				ImGui::ColorEdit3("Object Color", (float*)&model.color);
 				ImGui::Separator();
+				ImGui::ColorEdit3("Object ambient", (float*)&model.ambientColor);
+
+				ImGui::Separator();
+				ImGui::ColorEdit3("Object diffuse", (float*)&model.diffuseColor);
+
+				ImGui::Separator();
+				ImGui::ColorEdit3("Object specular", (float*)&model.specularColor);
+
+				ImGui::Separator();
 				ImGui::Checkbox("Draw Axis", &(model.drawAxis));
 				ImGui::Separator();
 				ImGui::Checkbox("Draw Bounding Box", &(model.drawBoundingBox));
@@ -607,7 +616,7 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 					if (ImGui::Selectable(bufc, selectedLight == n))
 						selectedLight = n;
 				}
-				
+
 				Light& light = scene.GetLight(selectedLight);
 
 				ImGui::Text("Local Translate:");
@@ -626,34 +635,35 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 				ImGui::SameLine();
 				ImGui::RadioButton("Diffuse", &(light.reflectionType), 1);
 				ImGui::SameLine();
+				
 				ImGui::RadioButton("Specular", &(light.reflectionType), 2);
 
-				if (light.reflectionType == 0) {
-					ImGui::Separator();
-					ImGui::ColorEdit3("Light Color", (float*)&light.ambientColor);
-				}
-				else if (light.reflectionType == 1) {
-					ImGui::Separator();
-					ImGui::ColorEdit3("Light Color", (float*)&light.diffuseColor);
-				}
-				else if (light.reflectionType == 2) {
-					ImGui::Separator();
-					ImGui::ColorEdit3("Light Color", (float*)&light.specularColor);
-				}
+				ImGui::Separator();
+				ImGui::InputFloat("The alpha of today that i will use for specular", &(light.alpha), 0.1, 0.1, "%.2f");
+				
+				ImGui::Separator();
+				ImGui::ColorEdit3("Light ambient Color", (float*)&light.ambientColor);
 
+				ImGui::Separator();
+				ImGui::ColorEdit3("Light diffuse Color", (float*)&light.diffuseColor);
+
+				ImGui::Separator();
+				ImGui::ColorEdit3("Light specular Color", (float*)&light.specularColor);
+
+
+
+				ImGui::EndTabItem();
 			}
-			ImGui::EndTabItem();
+
+
+			ImGui::EndTabBar();
 		}
+		ImGui::End();
 
 
-		ImGui::EndTabBar();
+
+
+
 	}
-	ImGui::End();
-
-
-	
-
-	
-
 
 }

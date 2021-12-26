@@ -12,6 +12,7 @@ void Light::GetTransform(glm::mat4x4 transformMat) {
 	worldTranslateMat[3][1] = worldTranslateArray[1];
 	worldTranslateMat[3][2] = worldTranslateArray[2];
 
-	updatedLocation = localTranslateMat * glm::vec4(location, 1);
+	this->updatedLocation = transformMat * localTranslateMat * glm::vec4(location, 1);
+	//std::cout << glm::to_string(updatedLocation) << std::endl;
 	//updatedLocation.z *= -1.0f;
 }

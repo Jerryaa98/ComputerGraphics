@@ -517,9 +517,9 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 					ImGui::Separator();
 
 					ImGui::Text("Local Rotate:");
-					ImGui::InputFloat("Local Rotate X", &model.localRotateArray[0], 1, 1, "%.0f");
-					ImGui::InputFloat("Local Rotate Y", &model.localRotateArray[1], 1, 1, "%.0f");
-					ImGui::InputFloat("Local Rotate Z", &model.localRotateArray[2], 1, 1, "%.0f");
+					ImGui::InputFloat("Local Rotate X", &model.localRotateArray[0], 10, 10, "%.0f");
+					ImGui::InputFloat("Local Rotate Y", &model.localRotateArray[1], 10, 10, "%.0f");
+					ImGui::InputFloat("Local Rotate Z", &model.localRotateArray[2], 10, 10, "%.0f");
 
 					ImGui::Separator();
 					ImGui::Separator();
@@ -628,18 +628,9 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 				ImGui::InputFloat("World Translate X", &light.worldTranslateArray[0], 0.1, 5, "%.2f");
 				ImGui::InputFloat("World Translate Y", &light.worldTranslateArray[1], 0.1, 5, "%.2f");
 				ImGui::InputFloat("World Translate Z", &light.worldTranslateArray[2], 0.1, 5, "%.2f");
-
-				ImGui::Text("Reflection Type:");
-				ImGui::SameLine();
-				ImGui::RadioButton("Ambient", &(light.reflectionType), 0);
-				ImGui::SameLine();
-				ImGui::RadioButton("Diffuse", &(light.reflectionType), 1);
-				ImGui::SameLine();
 				
-				ImGui::RadioButton("Specular", &(light.reflectionType), 2);
-
 				ImGui::Separator();
-				ImGui::InputFloat("The alpha of today that i will use for specular", &(light.alpha), 0.1, 0.1, "%.2f");
+				ImGui::InputFloat("alpha for specular", &(light.alpha), 0.1, 0.1, "%.2f");
 				
 				ImGui::Separator();
 				ImGui::ColorEdit3("Light ambient Color", (float*)&light.ambientColor);

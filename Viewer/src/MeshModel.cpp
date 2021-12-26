@@ -174,6 +174,12 @@ std::vector<glm::vec3> MeshModel::Draw(glm::mat4x4 cameraTransform) {
 	maxZ = -1.0f * FLT_MAX;
 	minZ = FLT_MAX;
 
+	float maxX = -1.0f * FLT_MAX;
+	float minX = FLT_MAX;
+
+	float maxY = -1.0f * FLT_MAX;
+	float minY = FLT_MAX;
+
 	int verticesCount = this->vertices.size();
 	for (int i = 0; i < verticesCount; i++) {
 		glm::vec4 vector = matrix * glm::vec4(this->vertices.at(i), 1.0f);
@@ -182,7 +188,22 @@ std::vector<glm::vec3> MeshModel::Draw(glm::mat4x4 cameraTransform) {
 		newVertices.push_back(glm::vec3(vector.x / vector.w, vector.y / vector.w, vector.z / vector.w));
 		minZ = std::min(minZ, (vector.z / vector.w));
 		maxZ = std::max(maxZ, vector.z / vector.w);
+
+		minX = std::min(minX, (vector.x / vector.w));
+		maxX = std::max(maxX, vector.x / vector.w);
+
+		minY = std::min(minY, (vector.y / vector.w));
+		maxY = std::max(maxY, vector.y / vector.w);
 	}
+
+	//std::cout << minX << std::endl;
+	//std::cout << maxX << std::endl;
+	//
+	//std::cout << minY << std::endl;
+	//std::cout << maxY << std::endl;
+	//
+	//std::cout << minZ << std::endl;
+	//std::cout << maxZ << std::endl << std::endl;
 
 	int facesCount = this->GetFacesCount();
 	int counter = 0;

@@ -366,7 +366,7 @@ void Renderer::DrawTriangle(glm::vec3& p1, glm::vec3& p2, glm::vec3& p3, MeshMod
 		float y = (U.z * V.x) - (U.x * V.z);
 		float z1 = (U.x * V.y) - (U.y * V.x);
 
-		glm::vec3 normal = glm::vec3(x, y, z1);
+		glm::vec3 normal = glm::normalize(glm::vec3(x, y, z1));
 
 		for (int y = yMax; y >= yMin; y--) {
 			for (int x = xMin; x <= xMax; x++) {
@@ -378,29 +378,34 @@ void Renderer::DrawTriangle(glm::vec3& p1, glm::vec3& p2, glm::vec3& p3, MeshMod
 
 					A = a1 + a2 + a3;
 					z = ((a1 * p3.z) / A) + ((a2 * p1.z) / A) + ((a3 * p2.z) / A);
-					float interpolation = 1.0f - ((this->maxZ - z) / (this->maxZ - this->minZ));
+					//float interpolation = 1.0f - ((this->maxZ - z) / (this->maxZ - this->minZ));
+					float interpolation = 1.0f;
 					
 					for (int i = 0; i < scene.GetLightCount(); i++) {
 						Light& light = scene.GetLight(i);
-						glm::vec3 finalColor = glm::vec3(0.0f, 0.0f, 0.0f);
+						
 
 						// Ambient
-						glm::vec3 Ia = interpolation * light.ambientColor* model.ambientColor;
+						glm::vec3 Ia = light.ambientColor * model.ambientColor;
+						//cout << glm::to_string(Ia) << endl;
+
 
 						// Diffuse
-						glm::vec3 lightVector = glm::vec3(x, y, z) - light.updatedLocation;
-						glm::vec3 Id = interpolation * light.diffuseColor * glm::dot(normal, lightVector) * model.diffuseColor;
+						glm::vec3 lightVector = glm::normalize(light.updatedLocation - glm::vec3(x, y, z));
+						glm::vec3 Id = 1000.0f * light.diffuseColor * model.diffuseColor * max((float)glm::dot(normal, lightVector), 0.0f);
+						//cout << glm::to_string(Id) << endl;
 
 
 						// Specular
-						glm::vec3 I = glm::normalize(light.updatedLocation - glm::vec3(x, y, z));
-						glm::vec3 reflection = I - 2 * glm::dot(I, glm::normalize(normal)) * glm::normalize(normal);
 						float* arr = scene.GetActiveCamera().eye;
-						glm::vec3 roro = glm::vec3(arr[0], arr[1], arr[2]);
-						glm::vec3 Is = interpolation * light.specularColor * (float)pow(max(0.0f, glm::dot((roro - glm::vec3(x, y, z)), reflection)), light.alpha)* model.specularColor;
-						//cout << glm::to_string(Is) << endl;
-						PutPixel(x, y, Ia + Id + Is, z);
-
+						glm::vec3 R = glm::normalize((2 * glm::dot(lightVector, normal) * normal) - lightVector);
+						glm::vec3 cameraLocation = glm::vec3(arr[0], arr[1], arr[2]);
+						glm::vec3 V = glm::normalize(cameraLocation - glm::vec3(x, y, z));
+						glm::vec3 Is = light.specularColor * model.specularColor * pow(max((float)glm::dot(R, V), 0.0f), light.alpha);
+						
+						glm::vec3 finalColor = 0.3f * (Ia + Id + Is);
+						//finalColor /= max(max(finalColor.x, finalColor.y), finalColor.z);
+						PutPixel(x, y, finalColor, z);
 					}
 				}
 			}

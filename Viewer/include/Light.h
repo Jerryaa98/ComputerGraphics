@@ -18,6 +18,17 @@ public:
 	glm::mat4x4 localTranslateMat = glm::mat4x4(1.0f);
 	glm::mat4x4 worldTranslateMat = glm::mat4x4(1.0f);
 
+	float highValue1 = 1000.0f;
+	float highValue2 = 1000.0f;
+	float highValue3 = 1000.0f;
+
+	/*
+	0 - flat shading
+	1 - gouraud
+	2 - phong
+	*/
+	int lightingType = 0;
+
 
 	glm::vec3 location = glm::vec3(0.0f, 0.0f, 0.0f);
 	glm::vec3 updatedLocation = glm::vec3(location);

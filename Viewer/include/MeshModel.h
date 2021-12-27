@@ -23,7 +23,7 @@ public:
 	*/
 
 	float localTranslateArray[3] = { 0, 0, 0 };
-	float localRotateArray[3] = { 0, 0, 0 };
+	float localRotateArray[3] = { 0, 180, 0 };
 	float localScaleArray[3] = { 1, 1, 1 };
 	bool lockLocalScale = true;
 	float localScaleLocked = 0.01;
@@ -45,8 +45,8 @@ public:
 	int LocalWorldEditObject = 1;
 
 	bool trianglesBoundingBoxes = false;
-	bool coloredTriangles = false;
-	bool trianglesOutlines = true;
+	bool coloredTriangles = true;
+	bool trianglesOutlines = false;
 
 
 	int maxScale = 0;
@@ -74,6 +74,10 @@ public:
 	glm::mat4x4 objectTransformation = glm::mat4x4(1.0f);
 
 	glm::vec3 color = glm::vec3((float)rand() / RAND_MAX, (float)rand() / RAND_MAX, (float)rand() / RAND_MAX);
+
+	std::vector<std::vector<int>> verticesToNormals;
+	std::vector<glm::vec3> normals;
+	std::vector<glm::vec3> transformedNormals;
 private:
 
 	float maxCoordinates[3] = { -1.0f * FLT_MAX, -1.0f * FLT_MAX, -1.0f * FLT_MAX };
@@ -97,7 +101,6 @@ private:
 	glm::mat4x4 axisTransformation = glm::mat4x4(1.0f);
 
 	
-	std::vector<glm::vec3> normals;
 	std::string model_name;
 	glm::mat4x4 worldTransform;
 };

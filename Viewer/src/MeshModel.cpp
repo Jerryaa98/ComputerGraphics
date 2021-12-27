@@ -73,6 +73,28 @@ MeshModel::MeshModel(std::vector<Face> faces, std::vector<glm::vec3> vertices, s
 		maxScale = maxCoordinates[1];
 	if (maxScale < maxCoordinates[2])
 		maxScale = maxCoordinates[2];
+
+	verticesToNormals = std::vector<std::vector<int>>((vertices.size()));
+
+	int facesCount = this->GetFacesCount();
+	for (int j = 0; j < facesCount; j++) {
+		Face face = GetFace(j);
+
+		// VERTICES
+		int v1Index = face.GetVertexIndex(0) - 1;
+		int v2Index = face.GetVertexIndex(1) - 1;
+		int v3Index = face.GetVertexIndex(2) - 1;
+
+
+		int n1Index = face.GetNormalIndex(0) - 1;
+		int n2Index = face.GetNormalIndex(1) - 1;
+		int n3Index = face.GetNormalIndex(2) - 1;
+
+		verticesToNormals[v1Index].push_back(n1Index);
+		verticesToNormals[v2Index].push_back(n2Index);
+		verticesToNormals[v3Index].push_back(n3Index);
+
+	}
 }
 
 MeshModel::~MeshModel()
@@ -204,6 +226,16 @@ std::vector<glm::vec3> MeshModel::Draw(glm::mat4x4 cameraTransform) {
 	//
 	//std::cout << minZ << std::endl;
 	//std::cout << maxZ << std::endl << std::endl;
+
+	int normalsCount = this->vertices.size();
+	std::vector<glm::vec3> transformedNormals1;
+	for (int i = 0; i < normalsCount; i++) {
+		glm::vec4 vector = this->objectTransform * glm::vec4(this->normals.at(i), 1.0f);
+
+		// cut the w coordinate
+		transformedNormals1.push_back(glm::vec3(vector.x / vector.w, vector.y / vector.w, vector.z / vector.w));
+	}
+	transformedNormals = transformedNormals1;
 
 	int facesCount = this->GetFacesCount();
 	int counter = 0;

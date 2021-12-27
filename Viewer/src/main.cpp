@@ -213,11 +213,11 @@ void RenderFrame(GLFWwindow* window, Scene& scene, Renderer& renderer, ImGuiIO& 
 			// Left mouse button is down
 			if (scene.GetModelCount() > 0) {
 				MeshModel& model = scene.GetActiveModel();
-				//model.localRotateArray[1] += newCoordinates[0] - oldCoordinates[0];
-				//model.localRotateArray[0] += newCoordinates[1] - oldCoordinates[1];
+				model.localRotateArray[1] += (newCoordinates[0] - oldCoordinates[0]) / 10;
+				model.localRotateArray[0] += (newCoordinates[1] - oldCoordinates[1]) / 10;
 
-				scene.GetActiveCamera().worldRotateArray[1] += (newCoordinates[0] - oldCoordinates[0]) / 10;
-				scene.GetActiveCamera().worldRotateArray[0] += (newCoordinates[1] - oldCoordinates[1]) / 10;
+				// scene.GetActiveCamera().worldRotateArray[1] += (newCoordinates[0] - oldCoordinates[0]) / 10;
+				// scene.GetActiveCamera().worldRotateArray[0] += (newCoordinates[1] - oldCoordinates[1]) / 10;
 			}
 			
 			
@@ -624,10 +624,18 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 				ImGui::InputFloat("Local Translate Y", &light.localTranslateArray[1], 0.1, 5, "%.2f");
 				ImGui::InputFloat("Local Translate Z", &light.localTranslateArray[2], 0.1, 5, "%.2f");
 
-				ImGui::Text("World Translate:");
-				ImGui::InputFloat("World Translate X", &light.worldTranslateArray[0], 0.1, 5, "%.2f");
-				ImGui::InputFloat("World Translate Y", &light.worldTranslateArray[1], 0.1, 5, "%.2f");
-				ImGui::InputFloat("World Translate Z", &light.worldTranslateArray[2], 0.1, 5, "%.2f");
+
+				ImGui::InputFloat("high value1", &light.highValue1, 100, 5, "%.2f");
+				ImGui::InputFloat("high value2", &light.highValue2, 100, 5, "%.2f");
+				ImGui::InputFloat("high value3", &light.highValue3, 100, 5, "%.2f");
+
+				ImGui::Text("Lighting Type:");
+				ImGui::SameLine();
+				ImGui::RadioButton("flat shading", &(light.lightingType), 0);
+				ImGui::SameLine();
+				ImGui::RadioButton("gouraud", &(light.lightingType), 1);
+				ImGui::SameLine();
+				ImGui::RadioButton("phong", &(light.lightingType), 2);
 				
 				ImGui::Separator();
 				ImGui::InputFloat("alpha for specular", &(light.alpha), 0.1, 0.1, "%.2f");

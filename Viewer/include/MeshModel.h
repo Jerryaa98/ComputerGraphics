@@ -56,6 +56,12 @@ public:
 	float maxZ = -1.0f * FLT_MAX;
 	float minZ = FLT_MAX;
 
+	float maxX = -1.0f * FLT_MAX;
+	float minX = FLT_MAX;
+
+	float maxY = -1.0f * FLT_MAX;
+	float minY = FLT_MAX;
+
 	std::vector<glm::vec3> boundingBox;
 	std::vector<glm::vec3> axis;
 

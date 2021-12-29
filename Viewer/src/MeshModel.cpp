@@ -196,11 +196,11 @@ std::vector<glm::vec3> MeshModel::Draw(glm::mat4x4 cameraTransform) {
 	maxZ = -1.0f * FLT_MAX;
 	minZ = FLT_MAX;
 
-	float maxX = -1.0f * FLT_MAX;
-	float minX = FLT_MAX;
+	maxX = -1.0f * FLT_MAX;
+	minX = FLT_MAX;
 
-	float maxY = -1.0f * FLT_MAX;
-	float minY = FLT_MAX;
+	maxY = -1.0f * FLT_MAX;
+	minY = FLT_MAX;
 
 	int verticesCount = this->vertices.size();
 	for (int i = 0; i < verticesCount; i++) {

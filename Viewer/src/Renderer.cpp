@@ -383,43 +383,44 @@ void Renderer::CreateOpenglBuffer()
 }
 
 void Renderer::blurFilter1() {
-	cv::Mat R = cv::Mat::zeros(viewport_height, viewport_width, CV_8UC1);
-	cv::Mat G = cv::Mat::zeros(viewport_height, viewport_width, CV_8UC1);
-	cv::Mat B = cv::Mat::zeros(viewport_height, viewport_width, CV_8UC1);
-	std::cout << 1 << std::endl;
+	//cv::Mat R = cv::Mat::zeros(viewport_height, viewport_width, CV_8UC1);
+	//cv::Mat G = cv::Mat::zeros(viewport_height, viewport_width, CV_8UC1);
+	//cv::Mat B = cv::Mat::zeros(viewport_height, viewport_width, CV_8UC1);
+	//std::cout << 1 << std::endl;
+	//
+	//for (int i = 0; i < viewport_width; i++) {
+	//	for (int j = 0; j < viewport_height; j++) {
+	//		std::cout << i << " " << j << std::endl;
+	//		color_buffer[INDEX(viewport_width, i, j, 0)];
+	//		std::cout << 1 << std::endl;
+	//		R.at<float>(j, i);
+	//		std::cout << 2 << std::endl;
+	//		R.at<float>(j, i) = color_buffer[INDEX(viewport_width, i, j, 0)];
+	//		G.at<float>(j, i) = color_buffer[INDEX(viewport_width, i, j, 1)];
+	//		B.at<float>(j, i) = color_buffer[INDEX(viewport_width, i, j, 2)];
+	//		std::cout << 3 << std::endl;
+	//	}
+	//}
+	//std::cout << 2 << std::endl;
+	//cv::Mat Ro;
+	//cv::Mat Go;
+	//cv::Mat Bo;
+	//
+	//cv::GaussianBlur(R, Ro, cv::Size(convolutionSize, convolutionSize), std);
+	//cv::GaussianBlur(G, Go, cv::Size(convolutionSize, convolutionSize), std);
+	//cv::GaussianBlur(B, Bo, cv::Size(convolutionSize, convolutionSize), std);
+	//std::cout << 3 << std::endl;
+	//
+	//for (int i = 0; i < viewport_width; i++) {
+	//	for (int j = 0; j < viewport_height; j++) {
+	//		color_buffer[INDEX(viewport_width, i, j, 0)] = Ro.at<float>(i, j);
+	//		color_buffer[INDEX(viewport_width, i, j, 1)] = Go.at<float>(i, j);
+	//		color_buffer[INDEX(viewport_width, i, j, 2)] = Bo.at<float>(i, j);
+	//	}
+	//}
+	//std::cout << 4 << std::endl;
 
-	for (int i = 0; i < viewport_width; i++) {
-		for (int j = 0; j < viewport_height; j++) {
-			std::cout << i << " " << j << std::endl;
-			color_buffer[INDEX(viewport_width, i, j, 0)];
-			std::cout << 1 << std::endl;
-			R.at<float>(j, i);
-			std::cout << 2 << std::endl;
-			R.at<float>(j, i) = color_buffer[INDEX(viewport_width, i, j, 0)];
-			G.at<float>(j, i) = color_buffer[INDEX(viewport_width, i, j, 1)];
-			B.at<float>(j, i) = color_buffer[INDEX(viewport_width, i, j, 2)];
-			std::cout << 3 << std::endl;
-		}
-	}
-	std::cout << 2 << std::endl;
-	cv::Mat Ro;
-	cv::Mat Go;
-	cv::Mat Bo;
-
-	cv::GaussianBlur(R, Ro, cv::Size(convolutionSize, convolutionSize), std);
-	cv::GaussianBlur(G, Go, cv::Size(convolutionSize, convolutionSize), std);
-	cv::GaussianBlur(B, Bo, cv::Size(convolutionSize, convolutionSize), std);
-	std::cout << 3 << std::endl;
-
-	for (int i = 0; i < viewport_width; i++) {
-		for (int j = 0; j < viewport_height; j++) {
-			color_buffer[INDEX(viewport_width, i, j, 0)] = Ro.at<float>(i, j);
-			color_buffer[INDEX(viewport_width, i, j, 1)] = Go.at<float>(i, j);
-			color_buffer[INDEX(viewport_width, i, j, 2)] = Bo.at<float>(i, j);
-		}
-	}
-	std::cout << 4 << std::endl;
-
+	
 }
 
 void Renderer::SwapBuffers()
@@ -429,12 +430,6 @@ void Renderer::SwapBuffers()
 
 	// Makes glScreenTex (which was allocated earlier) the current texture.
 	glBindTexture(GL_TEXTURE_2D, gl_screen_tex);
-
-	if (blur) {
-		blurred = true;
-		blurFilter1();
-	}
-
 
 	// memcopy's colorBuffer into the gpu.
 	glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, viewport_width, viewport_height, GL_RGB, GL_FLOAT, color_buffer);
@@ -462,6 +457,48 @@ void Renderer::ClearColorBuffer(const glm::vec3& color)
 			z_buffer[Z_INDEX(viewport_width, i, j)] = -1.0f * FLT_MAX;
 		}
 	}
+}
+
+void Renderer::MSAA(float minX, float maxX, float minY, float maxY) {
+	for (int i = minX; i < maxX; i++) {
+		for (int j = minY; j < maxY; j++) {
+			if (z_buffer[Z_INDEX(viewport_width, i, j)] != -1.0f * FLT_MAX)
+			{
+				if (i != 0 && j != 0 && i != (viewport_width - 1) && j != (viewport_height - 1))
+				{
+
+					if (z_buffer[Z_INDEX(viewport_width, i - 1, j)] == -1.0f * FLT_MAX || z_buffer[Z_INDEX(viewport_width, i, j - 1)] == -1.0f * FLT_MAX || z_buffer[Z_INDEX(viewport_width, i + 1, j)] == -1.0f * FLT_MAX || z_buffer[Z_INDEX(viewport_width, i, j + 1)] == -1.0f * FLT_MAX ||
+						z_buffer[Z_INDEX(viewport_width, i - 1, j - 1)] == -1.0f * FLT_MAX || z_buffer[Z_INDEX(viewport_width, i + 1, j + 1)] == -1.0f * FLT_MAX || z_buffer[Z_INDEX(viewport_width, i - 1, j + 1)] == -1.0f * FLT_MAX || z_buffer[Z_INDEX(viewport_width, i + 1, j - 1)] == -1.0f * FLT_MAX)
+
+					{
+						glm::vec3 point = glm::vec3(color_buffer[INDEX(viewport_width, i, j, 0)], color_buffer[INDEX(viewport_width, i, j, 1)], color_buffer[INDEX(viewport_width, i, j, 2)]) / 4.0f;
+						glm::vec3 point1 = glm::vec3(color_buffer[INDEX(viewport_width, i, j - 1, 0)], color_buffer[INDEX(viewport_width, i, j - 1, 1)], color_buffer[INDEX(viewport_width, i, j - 1, 2)]) / 8.0f;
+						glm::vec3 point2 = glm::vec3(color_buffer[INDEX(viewport_width, i, j + 1, 0)], color_buffer[INDEX(viewport_width, i, j + 1, 1)], color_buffer[INDEX(viewport_width, i, j + 1, 2)]) / 8.0f;
+						glm::vec3 point3 = glm::vec3(color_buffer[INDEX(viewport_width, i - 1, j, 0)], color_buffer[INDEX(viewport_width, i - 1, j, 1)], color_buffer[INDEX(viewport_width, i - 1, j, 2)]) / 8.0f;
+						glm::vec3 point4 = glm::vec3(color_buffer[INDEX(viewport_width, i + 1, j, 0)], color_buffer[INDEX(viewport_width, i + 1, j, 1)], color_buffer[INDEX(viewport_width, i + 1, j, 2)]) / 8.0f;
+						glm::vec3 point5 = glm::vec3(color_buffer[INDEX(viewport_width, i + 1, j - 1, 0)], color_buffer[INDEX(viewport_width, i + 1, j - 1, 1)], color_buffer[INDEX(viewport_width, i + 1, j - 1, 2)]) / 16.0f;
+						glm::vec3 point6 = glm::vec3(color_buffer[INDEX(viewport_width, i + 1, j + 1, 0)], color_buffer[INDEX(viewport_width, i + 1, j + 1, 1)], color_buffer[INDEX(viewport_width, i + 1, j + 1, 2)]) / 16.0f;
+						glm::vec3 point7 = glm::vec3(color_buffer[INDEX(viewport_width, i - 1, j - 1, 0)], color_buffer[INDEX(viewport_width, i - 1, j - 1, 1)], color_buffer[INDEX(viewport_width, i - 1, j - 1, 2)]) / 16.0f;
+						glm::vec3 point8 = glm::vec3(color_buffer[INDEX(viewport_width, i - 1, j + 1, 0)], color_buffer[INDEX(viewport_width, i - 1, j + 1, 1)], color_buffer[INDEX(viewport_width, i - 1, j + 1, 2)]) / 16.0f;
+
+
+						glm::vec3 sum = point + point1 + point2 + point3 + point4 + point5 + point6 + point7 + point8;
+
+						PutPixel(i, j, sum, 100.0f);
+					}
+					else {
+						PutPixel(i, j, glm::vec3(color_buffer[INDEX(viewport_width, i, j, 0)], color_buffer[INDEX(viewport_width, i, j, 1)], color_buffer[INDEX(viewport_width, i, j, 2)]), 100.0f);
+					}
+
+				}
+				else
+					PutPixel(i, j, glm::vec3(color_buffer[INDEX(viewport_width, i, j, 0)], color_buffer[INDEX(viewport_width, i, j, 1)], color_buffer[INDEX(viewport_width, i, j, 2)]), 100.0f);
+
+			}
+		}
+	}
+
+
 }
 
 bool Renderer::pointInTriangle(const glm::ivec2& point, const glm::ivec2& p1, const glm::ivec2& p2, const glm::ivec2& p3) {
@@ -898,6 +935,11 @@ void Renderer::Render(const Scene& scene, std::shared_ptr<MeshModel> cameraModel
 
 	for (int i = 0; i < numOfModels; i++) {
 		MeshModel& model = scene.GetModel(i);
+		float maxX = -1.0f * FLT_MAX;
+		float minX = FLT_MAX;
+
+		float maxY = -1.0f * FLT_MAX;
+		float minY = FLT_MAX;
 
 		glm::mat4x4 trans = glm::mat4x4(1.0f);
 		trans[3][0] = 0;
@@ -926,6 +968,22 @@ void Renderer::Render(const Scene& scene, std::shared_ptr<MeshModel> cameraModel
 
 			v3.x = (v3.x + 1) * half_width;
 			v3.y = (v3.y + 1) * half_height;
+
+			minX = min(minX, v1.x);
+			minX = min(minX, v2.x);
+			minX = min(minX, v3.x);
+
+			maxX = max(maxX, v1.x);
+			maxX = max(maxX, v2.x);
+			maxX = max(maxX, v3.x);
+
+			minY = min(minY, v1.y);
+			minY = min(minY, v2.y);
+			minY = min(minY, v3.y);
+
+			maxY = max(maxY, v1.y);
+			maxY = max(maxY, v2.y);
+			maxY = max(maxY, v3.y);
 
 			DrawTriangle(v1, v2, v3, model, j, scene1);
 		}
@@ -1024,8 +1082,10 @@ void Renderer::Render(const Scene& scene, std::shared_ptr<MeshModel> cameraModel
 				DrawLine(pair.at(0), pair.at(1), glm::vec3(0, 255, 0));
 			}
 		}
-
-
+		
+		if (msaaFlag) {
+			MSAA(minX, maxX, minY, maxY);
+		}
 	}
 
 	if (scene.drawWorldAxis) {

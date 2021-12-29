@@ -34,6 +34,7 @@ public:
 	int convolutionSize = 3;
 	float std = 3;
 
+	bool msaaFlag = false;
 private:
 	void PutPixel(const int i, const int j, const glm::vec3& color, float depth);
 	void DrawLine(const glm::ivec3& p1, const glm::ivec3& p2, const glm::vec3& color);
@@ -41,6 +42,7 @@ private:
 	glm::vec3 fog(glm::vec3 color, float z);
 	void blurFilter();
 	void blurFilter1();
+	void MSAA(float minX, float maxX, float minY, float maxY);
 
 	bool pointInTriangle(const glm::ivec2& curr_point, const glm::ivec2& p1, const glm::ivec2& p2, const glm::ivec2& p3);
 

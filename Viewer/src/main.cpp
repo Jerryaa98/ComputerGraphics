@@ -35,7 +35,7 @@ ImGuiIO& SetupDearImgui(GLFWwindow* window);
 void StartFrame();
 void RenderFrame(GLFWwindow* window, Scene& scene, Renderer& renderer, ImGuiIO& io);
 void Cleanup(GLFWwindow* window);
-void DrawImguiMenus(ImGuiIO& io, Scene& scene);
+void DrawImguiMenus(ImGuiIO& io, Scene& scene, Renderer& renderer);
 
 /**
  * Function implementation
@@ -69,7 +69,7 @@ int main(int argc, char** argv)
 	{
 		glfwPollEvents();
 		StartFrame();
-		DrawImguiMenus(io, scene);
+		DrawImguiMenus(io, scene, renderer);
 		RenderFrame(window, scene, renderer, io);
 	}
 
@@ -269,7 +269,7 @@ void Cleanup(GLFWwindow* window)
 	glfwTerminate();
 }
 
-void DrawImguiMenus(ImGuiIO& io, Scene& scene)
+void DrawImguiMenus(ImGuiIO& io, Scene& scene, Renderer& renderer)
 {
 	/**
 	 * MeshViewer menu
@@ -312,8 +312,8 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 	 */
 
 	 // 1. Show the big demo window (Most of the sample code is in ImGui::ShowDemoWindow()! You can browse its code to learn more about Dear ImGui!).
-	if (show_demo_window)
-		ImGui::ShowDemoWindow(&show_demo_window);
+	//if (show_demo_window)
+	//	ImGui::ShowDemoWindow(&show_demo_window);
 
 
 	
@@ -327,6 +327,16 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 			ImGui::ColorEdit3("Background color", (float*)&clear_color);
 			ImGui::Text("FPS %.1f", ImGui::GetIO().Framerate);
 			ImGui::EndTabItem();
+
+			ImGui::Separator();
+			ImGui::Checkbox("Fog Effect", &(renderer.fogEffect));
+			ImGui::InputFloat("Fog Start", &(renderer.fogStart), 0.01, 0.01, "%.2f");
+			ImGui::InputFloat("Fog End", &(renderer.fogEnd), 0.01, 0.01, "%.2f");
+
+			ImGui::Separator();
+			ImGui::Separator();
+			ImGui::Checkbox("blur Effect", &(renderer.blur));
+			ImGui::InputFloat("STD", &(renderer.std), 0.1, 0.01, "%.2f");
 		}
 
 		if (ImGui::BeginTabItem("Camera")) {
@@ -592,6 +602,9 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 				ImGui::Checkbox("Colored Triangles", &(model.coloredTriangles));
 				ImGui::Separator();
 				ImGui::Checkbox("Triangles Outline", &(model.trianglesOutlines));
+				ImGui::Separator();
+				ImGui::Checkbox("Specular Reflection Vectors", &(model.specularReflection));
+				ImGui::InputFloat("Specular Reflection Scale", &(model.specularReflectionScale), 1, 1, "%.0f");
 			}
 			ImGui::EndTabItem();
 		}
@@ -620,9 +633,9 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 				Light& light = scene.GetLight(selectedLight);
 
 				ImGui::Text("Local Translate:");
-				ImGui::InputFloat("Local Translate X", &light.localTranslateArray[0], 0.1, 5, "%.2f");
-				ImGui::InputFloat("Local Translate Y", &light.localTranslateArray[1], 0.1, 5, "%.2f");
-				ImGui::InputFloat("Local Translate Z", &light.localTranslateArray[2], 0.1, 5, "%.2f");
+				ImGui::InputFloat("Local Translate X", &light.localTranslateArray[0], 50.0f, 5, "%.2f");
+				ImGui::InputFloat("Local Translate Y", &light.localTranslateArray[1], 50.0f, 5, "%.2f");
+				ImGui::InputFloat("Local Translate Z", &light.localTranslateArray[2], 50.0f, 5, "%.2f");
 
 
 				ImGui::InputFloat("high value1", &light.highValue1, 100, 5, "%.2f");

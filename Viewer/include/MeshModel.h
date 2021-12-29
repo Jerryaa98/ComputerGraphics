@@ -41,12 +41,14 @@ public:
 
 	float vertexNormalsScale = 0.05;
 	float faceNormalsScale = 0.001;
+	float specularReflectionScale = 40.0f;
 
 	int LocalWorldEditObject = 1;
 
 	bool trianglesBoundingBoxes = false;
 	bool coloredTriangles = true;
 	bool trianglesOutlines = false;
+	bool specularReflection = false;
 
 
 	int maxScale = 0;

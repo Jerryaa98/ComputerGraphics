@@ -5,6 +5,7 @@
 
 void Light::GetTransform(glm::mat4x4 transformMat) {
 	localTranslateMat[3][0] = localTranslateArray[0];
+	//localTranslateMat[3][0] = 100000000000.0f;
 	localTranslateMat[3][1] = localTranslateArray[1];
 	localTranslateMat[3][2] = localTranslateArray[2];
 

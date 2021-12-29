@@ -6,7 +6,7 @@
 class Light
 {
 public:
-	float alpha = 7;
+	float alpha = 1;
 
 	glm::vec3 ambientColor = glm::vec3(1.0f, 1.0f, 1.0f);
 	//glm::vec3 diffuseColor = glm::vec3(1.0f / 256.0f, 1.0f  / 256.0f ,4.0f / 256.0f);
@@ -14,13 +14,14 @@ public:
 	glm::vec3 specularColor = glm::vec3(1.0f, 1.0f, 1.0f);
 
 	float localTranslateArray[3] = { 1000, 300, 0 };
+	//float localTranslateArray[3] = { INFINITY, 300, 0 };
 	float worldTranslateArray[3] = { 0, 0, 0 };
 	glm::mat4x4 localTranslateMat = glm::mat4x4(1.0f);
 	glm::mat4x4 worldTranslateMat = glm::mat4x4(1.0f);
 
-	float highValue1 = 1000.0f;
-	float highValue2 = 1000.0f;
-	float highValue3 = 1000.0f;
+	float highValue1 = 1.0f;
+	float highValue2 = 1.0f;
+	float highValue3 = 1.0f;
 
 	/*
 	0 - flat shading

@@ -577,8 +577,6 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene, Renderer& renderer)
 
 				}
 				ImGui::Text("Object Addons:");
-				ImGui::ColorEdit3("Object Color", (float*)&model.color);
-				ImGui::Separator();
 				ImGui::ColorEdit3("Object ambient", (float*)&model.ambientColor);
 
 				ImGui::Separator();
@@ -603,9 +601,6 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene, Renderer& renderer)
 				ImGui::Checkbox("Colored Triangles", &(model.coloredTriangles));
 				ImGui::Separator();
 				ImGui::Checkbox("Triangles Outline", &(model.trianglesOutlines));
-				ImGui::Separator();
-				ImGui::Checkbox("Specular Reflection Vectors", &(model.specularReflection));
-				ImGui::InputFloat("Specular Reflection Scale", &(model.specularReflectionScale), 1, 1, "%.0f");
 			}
 			ImGui::EndTabItem();
 		}

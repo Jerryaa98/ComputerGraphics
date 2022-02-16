@@ -1,72 +1,81 @@
 #pragma once
+#include <memory>
 #include <glm/glm.hpp>
-#include <iostream>
-#include "vector"
-#include "Face.h"
 #include "MeshModel.h"
-
-
+/*
+ * Camera class. This class takes care of all the camera transformations and manipulations.
+ */
 class Camera
 {
-public:
-	Camera();
-	virtual ~Camera();
+private:
+	glm::mat4x4 viewTransformation;
+	glm::mat4x4 projectionTransformation;
 
-	glm::mat4x4 GetCameraLookAt();
+	glm::vec3 eye;
+	glm::vec3 up;
+	glm::vec3 at;
+
+	glm::vec3 x;
+	glm::vec3 y;
+	glm::vec3 z;
+
+	float zoom;
+	float fovy;
+	float height;
+	float zNear;
+	float zFar;
+	float aspectRatio;
+
+	bool prespective;
+
+public:
+	Camera(const glm::vec3& eye, const glm::vec3& at, const glm::vec3& up, const float aspectRatio);
+	~Camera();
+
+	void SetOrthographicProjection(
+		const float height,
+		const float aspectRatio,
+		const float zNear,
+		const float zFar);
+
+	void SetPerspectiveProjection(
+		const float fovy,
+		const float aspect,
+		const float zNear,
+		const float zFar);
+
+	void UpdateProjectionMatrix();
+
+	void SetNear(const float zNear);
+
+	void SetFar(const float zFar);
+
+	void SetFovy(const float fovy);
+
+	void SetHeight(const float height);
+
+	void Zoom(const float factor);
+
+	void SphericalRotate(const glm::vec2& sphericalDelta);
 
 	const glm::mat4x4& GetProjectionTransformation() const;
+
 	const glm::mat4x4& GetViewTransformation() const;
-	void Camera::IncrementalTrans(bool GoRightLeft);
 
-	float localTranslateArray[3] = { 0, 0, 0 };
-	float localRotateArray[3] = { 0, 0, 0 };
+	void SetAspectRatio(float aspectRatio);
 
-	float worldTranslateArray[3] = { 0, 0, 0 };
-	float worldRotateArray[3] = { 0, 0, 0 };
+	void SwitchToPrespective();
+	void SwitchToOrthographic();
 
+	float GetNear();
 
-	int half_width;
-	int half_height;
+	float GetFar();
 
-	glm::mat4x4 GetTransform();
+	float GetFovy();
 
-	int OrthoPerspective = 0;
+	float GetHeight();
 
-	float nearVal;
-	float farVal;
-	float right;
-	float left;
-	float top;
-	float bottom;
-	float fov;
+	bool IsPrespective();
 
-	float eye[3];
-	float at[3];
-
-	glm::mat4x4 drawTransformation;
-private:
-
-	std::vector<Face> faces;
-	std::vector<glm::vec3> vertices;
-
-
-	// local matrices (init with identity matrix)
-	glm::mat4x4 localTranslateMat = glm::mat4x4(1.0f);
-	glm::mat4x4 localRotateXMat = glm::mat4x4(1.0f);
-	glm::mat4x4 localRotateYMat = glm::mat4x4(1.0f);
-	glm::mat4x4 localRotateZMat = glm::mat4x4(1.0f);
-
-	// world matrices (init with identity matrix)
-	glm::mat4x4 worldTranslateMat = glm::mat4x4(1.0f);
-	glm::mat4x4 worldRotateXMat = glm::mat4x4(1.0f);
-	glm::mat4x4 worldRotateYMat = glm::mat4x4(1.0f);
-	glm::mat4x4 worldRotateZMat = glm::mat4x4(1.0f);
-
-	glm::mat4x4 objectTransform;
-	glm::mat4x4 worldTransform;
-
-	glm::mat4x4 orthographic;
-
-	glm::mat4x4 view_transformation;
-	glm::mat4x4 projection_transformation;
+	const glm::vec3& GetEye() const;
 };
